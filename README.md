@@ -15,3 +15,22 @@ El sistema ayuda a gestionar las reservas del hotel, incluyendo la disponibilida
 
 Los servicios pueden trabajar de forma independiente. Entre los procesos independientes se encuentran la autenticación, la disponibilidad de habitaciones y el envío de notificaciones.
 
+## Comunicación entre servicios
+
+Los servicios se comunican entre sí cuando necesitan información para completar un proceso.
+
+* **Reservas → Habitaciones:** Consulta la disponibilidad antes de confirmar una reserva.
+* **Reservas → Usuarios:** Solicita los datos del cliente que está realizando la reserva.
+* **Pagos → Reservas:** Solicita los datos de la reserva para verificar que exista y conocer el total que debe cobrarse.
+* **Habitaciones, Usuarios y Reservas:** Responden a las solicitudes entregando la información correspondiente.
+
+## Tipo de arquitectura
+
+**Arquitectura de Microservicios**
+
+Se eligió una arquitectura basada en microservicios porque permite dividir el sistema del Hotel Alma Blanca en servicios independientes.
+
+Cada servicio puede manejar diferentes cargas y crecer de acuerdo con su propia demanda. Además, permite actualizar o ampliar los servicios de manera independiente conforme aumente el tamaño del hotel.
+
+El sistema inicialmente es pequeño, pero está diseñado pensando en un crecimiento a largo plazo. Se espera un flujo moderado de clientes, con posibilidad de incremento durante temporadas altas, especialmente en los servicios de reservas y pagos.
+
