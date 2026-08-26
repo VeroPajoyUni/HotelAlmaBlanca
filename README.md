@@ -34,3 +34,30 @@ Cada servicio puede manejar diferentes cargas y crecer de acuerdo con su propia 
 
 El sistema inicialmente es pequeño, pero está diseñado pensando en un crecimiento a largo plazo. Se espera un flujo moderado de clientes, con posibilidad de incremento durante temporadas altas, especialmente en los servicios de reservas y pagos.
 
+## Base de datos
+
+Cada servicio tendrá **su propia base de datos**, siguiendo el principio de independencia de los microservicios.
+
+La información que debe almacenarse incluye:
+
+* Datos de los usuarios: clientes, recepcionistas y administradores.
+* Información de las habitaciones.
+* Disponibilidad de las habitaciones.
+* Reservas realizadas.
+* Pagos procesados.
+* Historial de transacciones.
+
+Los datos más críticos son los relacionados con **reservas y pagos**, ya que permiten conocer qué habitaciones están ocupadas y cuáles han sido pagadas.
+
+La pérdida de esta información podría generar problemas como pérdida de reservas, errores en el registro de habitaciones ocupadas o cobradas, sobreventa y reclamos por parte de los clientes.
+
+## Usuarios del sistema
+
+El sistema tendrá tres tipos principales de usuarios:
+
+* **Usuario Cliente / Huésped:** Puede consultar habitaciones, buscar disponibilidad, realizar reservas, efectuar pagos y gestionar sus propias reservas.
+* **Usuario Administrador:** Gestiona permisos y perfiles, además de administrar tarifas, habitaciones y reportes.
+* **Usuario Recepcionista:** Consulta y administra reservas, gestiona reservas presenciales y realiza procesos de `check-in` y `check-out`.
+
+Cada tipo de usuario tendrá permisos diferentes de acuerdo con sus responsabilidades dentro del sistema.
+
