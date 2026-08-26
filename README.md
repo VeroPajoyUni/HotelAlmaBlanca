@@ -61,3 +61,11 @@ El sistema tendrá tres tipos principales de usuarios:
 
 Cada tipo de usuario tendrá permisos diferentes de acuerdo con sus responsabilidades dentro del sistema.
 
+## Riesgos y fallas posibles
+
+* **Falla del servicio de pagos:** El usuario podría ver su pago rechazado, lo que generaría frustración e incertidumbre. Para mitigarlo, se debe enviar una notificación clara explicando el problema e invitarlo a intentar el pago nuevamente.
+
+* **Falla de la base de datos:** No sería posible consultar ni almacenar nueva información, lo que afectando el funcionamiento general de la plataforma. Como medida preventiva, es fundamental contar con copias de seguridad que permitan recuperar los datos y restablecer el servicio.
+
+* **Falla del servidor principal:** La pagina web dejaria de estar disponible y los usuarios no podrán acceder a su contenido. Una posible solución es disponer de un servidor de respaldo que tome el control automáticamente o restaurar el servicio principal en el menor tiempo posible.
+
