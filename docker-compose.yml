@@ -1,0 +1,60 @@
+services:
+
+  home:
+    build: ./home
+    ports:
+      - "3000:80"
+      
+  api-gateway:
+    image: node:alpine
+    command: sh -c "echo 'API Gateway (pendiente de implementar)' && sleep infinity"
+    
+  usuarios-db:
+    image: postgres:alpine
+    command: sh -c "echo 'Base de datos de Usuarios (pendiente)' && sleep infinity"
+    
+  usuarios:
+    image: node:alpine
+    command: sh -c "echo 'Servicio Usuarios (pendiente de implementar)' && sleep infinity"
+    depends_on:
+      - usuarios-db
+      
+  habitaciones-db:
+    image: postgres:alpine
+    command: sh -c "echo 'Base de datos de Habitaciones (pendiente)' && sleep infinity"
+    
+  habitaciones:
+    image: node:alpine
+    command: sh -c "echo 'Servicio Habitaciones (pendiente de implementar)' && sleep infinity"
+    depends_on:
+      - habitaciones-db
+      
+  reservas-db:
+    image: postgres:alpine
+    command: sh -c "echo 'Base de datos de Reservas (pendiente)' && sleep infinity"
+    
+  reservas:
+    image: node:alpine
+    command: sh -c "echo 'Servicio Reservas (pendiente de implementar)' && sleep infinity"
+    depends_on:
+      - reservas-db
+      
+  pagos-db:
+    image: postgres:alpine
+    command: sh -c "echo 'Base de datos de Pagos (pendiente)' && sleep infinity"
+    
+  pagos:
+    image: node:alpine
+    command: sh -c "echo 'Servicio Pagos (pendiente de implementar)' && sleep infinity"
+    depends_on:
+      - pagos-db
+      
+  notificaciones-db:
+    image: redis:alpine
+    command: sh -c "echo 'Base de datos de Notificaciones (pendiente)' && sleep infinity"
+    
+  notificaciones:
+    image: node:alpine
+    command: sh -c "echo 'Servicio Notificaciones (pendiente de implementar)' && sleep infinity"
+    depends_on:
+      - notificaciones-db
