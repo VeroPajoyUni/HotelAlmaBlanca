@@ -5,6 +5,17 @@
 Este proyecto busca permitir a los clientes consultar las habitaciones disponibles en el hotel y realizar reservaciones de una forma intuitiva y sencilla.
 El sistema ayuda a gestionar las reservas del hotel, incluyendo la disponibilidad de habitaciones, reservas, pagos y confirmaciones, evitando depender de procesos manuales.
 
+## Objetivo
+Permitir a los clientes consultar habitaciones disponibles y realizar reservas de forma intuitiva y sencilla, y dar el primer paso desde la idea del proyecto hacia una solución distribuida contenerizada con Docker.
+
+## Integrantes y roles
+| Integrante | Rol |
+|---|---|
+| Maira Yarlin García Rivera | Líder del proyecto |
+| Andrés Casanova Rengifo | Encargado de presentación |
+| Yisel Verónica Pajoy Maca | Encargada técnica |
+| Danilo Alexander Collazos Alegría | Encargado de documentación |
+
 ## Servicios del sistema
 
 * **Servicio de Usuarios:** Gestiona el registro y la información de clientes, recepcionistas y administradores.
