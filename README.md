@@ -50,6 +50,12 @@ Esto construye la imagen de `home` a partir de su Dockerfile y publica la vista 
 
 Cada uno de esos servicios tiene además un servicio `*-db` asociado sobre `postgres:alpine` (`usuarios-db`, `habitaciones-db`, `reservas-db`, `pagos-db`) o `redis:alpine` (`notificaciones-db`), declarado con `depends_on` para dejar explícita la regla de "una base de datos por microservicio". En todos los casos se sobreescribe el comando por defecto de la imagen para que el contenedor solo se mantenga activo, sin llegar a inicializar un servidor de base de datos real, siguen siendo marcadores de posición hasta el siguiente avance que se nos indique.
 
+## Estado actual
+- **Diseñado:** Arquitectura completa de microservicios (5 servicios y API Gateway), roles de usuario, comunicación entre servicios.
+- **Configurado:** `docker-compose.yml` con todos los servicios y sus respectivas bases de datos declarados, incluyendo la dependencia `depends_on` de cada servicio hacia su propia base de datos.
+- **Implementado:** Vista Home contenerizada y funcionando (`Dockerfile` e `index.html`).
+- **Pendiente:** API Gateway, lógica interna de cada microservicio, bases de datos, autenticación, pagos y notificaciones reales, los cuales se realizarán de acuerdo al siguiente avance que se nos indique.
+
 ## Tipo de arquitectura
 
 **Arquitectura de Microservicios**
