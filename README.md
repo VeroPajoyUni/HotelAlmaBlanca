@@ -16,6 +16,12 @@ Permitir a los clientes consultar habitaciones disponibles y realizar reservas d
 | Yisel Verónica Pajoy Maca | Encargada técnica |
 | Danilo Alexander Collazos Alegría | Encargado de documentación |
 
+## Arquitectura
+
+Nuestro proyecto se basa en la arquitectura de **microservicios**. El **Cliente** accede a la aplicación mediante una vista **Home**, desde donde las solicitudes HTTP serán gestionadas por un **API Gateway**. Este se encargará de recibir y enrutar las peticiones hacia los diferentes microservicios del backend mediante comunicación **HTTP/REST utilizando JSON**.
+
+La arquitectura contempla los microservicios de **Usuarios, Habitaciones, Reservas, Pagos y Notificaciones**, cada uno encargado de una funcionalidad específica del sistema. A su vez, cada microservicio cuenta con su **propia base de datos**, manteniendo el aislamiento de la información y evitando que otros servicios accedan directamente a ella.
+
 ## Servicios del sistema
 
 * **Servicio de Usuarios:** Gestiona el registro y la información de clientes, recepcionistas y administradores.
