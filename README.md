@@ -41,6 +41,15 @@ Los servicios se comunican entre sí cuando necesitan información para completa
 * **Pagos → Reservas:** Solicita los datos de la reserva para verificar que exista y conocer el total que debe cobrarse.
 * **Habitaciones, Usuarios y Reservas:** Responden a las solicitudes entregando la información correspondiente.
 
+## Docker Compose
+Para levantar la estructura inicial del proyecto:
+```
+docker compose up --build
+```
+Esto construye la imagen de `home` a partir de su Dockerfile y publica la vista en `http://localhost:3000`. Los demás servicios (`usuarios`, `habitaciones`, `reservas`, `pagos`, `notificaciones`) también se levantan, sobre `node:alpine`, pero por ahora solo mantienen un contenedor activo como marcador de su lugar en la arquitectura, sin lógica de negocio.
+
+Cada uno de esos servicios tiene además un servicio `*-db` asociado sobre `postgres:alpine` (`usuarios-db`, `habitaciones-db`, `reservas-db`, `pagos-db`) o `redis:alpine` (`notificaciones-db`), declarado con `depends_on` para dejar explícita la regla de "una base de datos por microservicio". En todos los casos se sobreescribe el comando por defecto de la imagen para que el contenedor solo se mantenga activo, sin llegar a inicializar un servidor de base de datos real, siguen siendo marcadores de posición hasta el siguiente avance que se nos indique.
+
 ## Tipo de arquitectura
 
 **Arquitectura de Microservicios**
@@ -85,4 +94,5 @@ Cada tipo de usuario tendrá permisos diferentes de acuerdo con sus responsabili
 * **Falla de la base de datos:** No sería posible consultar ni almacenar nueva información, lo que afectando el funcionamiento general de la plataforma. Como medida preventiva, es fundamental contar con copias de seguridad que permitan recuperar los datos y restablecer el servicio.
 
 * **Falla del servidor principal:** La pagina web dejaria de estar disponible y los usuarios no podrán acceder a su contenido. Una posible solución es disponer de un servidor de respaldo que tome el control automáticamente o restaurar el servicio principal en el menor tiempo posible.
+
 
