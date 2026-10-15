@@ -1,0 +1,4 @@
+flask
+requests
+# Conector de PostgreSQL para Python
+psycopg[binary]
