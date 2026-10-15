@@ -1,4 +1,4 @@
-# Nombre propio del proyecto: evita compartir volúmenes con otra carpeta llamada igual
+
 name: hotel-alma-blanca
 
 services:
@@ -75,44 +75,25 @@ services:
   pagos-db:
     image: postgres:alpine
     command: sh -c "echo 'Base de datos de Pagos (pendiente)' && sleep infinity"
-    # Al implementar Pagos, reemplazar el comando por la configuración:
-    # environment:
-    #   POSTGRES_DB: ${PAGOS_DB_NAME}
-    #   POSTGRES_USER: ${PAGOS_DB_USER}
-    #   POSTGRES_PASSWORD: ${PAGOS_DB_PASSWORD}
-    # ports:
-    #   - "5436:5432"
-    # volumes:
-    #   - pagos_data:/var/lib/postgresql/data
-    
+
   pagos:
     image: node:alpine
     command: sh -c "echo 'Servicio Pagos (pendiente de implementar)' && sleep infinity"
     depends_on:
       - pagos-db
-    # Al implementar el servicio, agregar:
-    # env_file:
-    #   - .env
       
   notificaciones-db:
     image: redis:alpine
     command: sh -c "echo 'Base de datos de Notificaciones (pendiente)' && sleep infinity"
-    # Al implementar Notificaciones, configurar su conexión con:
-    # NOTIFICACIONES_DB_HOST y NOTIFICACIONES_DB_PORT en .env
-    # ports:
-    #   - "5437:6379"
     
   notificaciones:
     image: node:alpine
     command: sh -c "echo 'Servicio Notificaciones (pendiente de implementar)' && sleep infinity"
     depends_on:
       - notificaciones-db
-    # Al implementar el servicio, agregar:
-    # env_file:
-    #   - .env
 
 volumes:
   reservas_data:
   usuarios_data:
   habitaciones_data:
-  # pagos_data:
+
