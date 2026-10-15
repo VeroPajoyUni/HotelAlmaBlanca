@@ -216,7 +216,7 @@ img {
 
 .forma-buscador {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     align-items: end;
 }
@@ -250,7 +250,7 @@ img {
 footer {
     padding: 60px 6%;
 
-    background-color: var(--primary-dark);
+    background-color: var(--color-dark);
 
     color: var(--color-white);
 
@@ -279,4 +279,153 @@ footer p {
     gap: 15px;
 
     margin-top: 10px;
+}
+
+/* ==================== MENSAJES DE LOS SERVICIOS ==================== */
+[hidden] {
+    display: none !important;
+}
+
+.mensaje {
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.mensaje.ok {
+    color: #2f6b3a;
+}
+
+.mensaje.error {
+    color: #a23b2a;
+}
+
+#btn-confirmar {
+    margin-top: 15px;
+    border: none;
+    cursor: pointer;
+}
+
+/* ==================== SECCIONES (habitaciones, reservas, registro) ==================== */
+.seccion {
+    width: 90%;
+    max-width: 1050px;
+    margin: 70px auto;
+}
+
+.seccion h2 {
+    font-family: var(--font-title);
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--color-dark);
+    margin-bottom: 25px;
+}
+
+/* ==================== TARJETAS DE HABITACIONES ==================== */
+.tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 20px;
+}
+
+.tarjeta {
+    padding: 25px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-white);
+    box-shadow: var(--shadow);
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.tarjeta h3 {
+    font-family: var(--font-title);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-dark);
+    margin-bottom: 8px;
+}
+
+.tarjeta-tipo {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-primary);
+}
+
+.tarjeta-precio {
+    margin: 12px 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: var(--color-dark);
+}
+
+/* ==================== ETIQUETAS DE ESTADO ==================== */
+.estado {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    background-color: var(--color-light);
+    color: var(--color-text);
+}
+
+.estado.disponible,
+.estado.pendiente {
+    background-color: #f3ead8;
+    color: var(--color-primary-dark);
+}
+
+.estado.ocupada,
+.estado.mantenimiento {
+    background-color: #eeeeee;
+    color: #888888;
+}
+
+/* ==================== TABLA DE RESERVAS ==================== */
+.tabla-contenedor {
+    overflow-x: auto;
+}
+
+.tabla-reservas {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tabla-reservas th,
+.tabla-reservas td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tabla-reservas th {
+    background-color: var(--color-light);
+    color: var(--color-dark);
+}
+
+.btn-eliminar {
+    padding: 6px 14px;
+    border: 1px solid #a23b2a;
+    border-radius: var(--border-radius);
+    background: none;
+    color: #a23b2a;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-eliminar:hover {
+    background-color: #a23b2a;
+    color: var(--color-white);
+}
+
+/* ==================== CELULARES ==================== */
+@media (max-width: 768px) {
+    .forma-buscador {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar nav {
+        display: none;
+    }
 }

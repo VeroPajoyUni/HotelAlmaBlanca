@@ -1,3 +1,6 @@
+
+name: hotel-alma-blanca
+
 services:
 
   home:
@@ -10,39 +13,69 @@ services:
     command: sh -c "echo 'API Gateway (pendiente de implementar)' && sleep infinity"
     
   usuarios-db:
-    image: postgres:alpine
-    command: sh -c "echo 'Base de datos de Usuarios (pendiente)' && sleep infinity"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${USUARIOS_DB_NAME}
+      POSTGRES_USER: ${USUARIOS_DB_USER}
+      POSTGRES_PASSWORD: ${USUARIOS_DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - usuarios_data:/var/lib/postgresql/data
     
   usuarios:
-    image: node:alpine
-    command: sh -c "echo 'Servicio Usuarios (pendiente de implementar)' && sleep infinity"
+    build: ./servicios/usuarios
+    ports:
+      - "5001:5000"
+    env_file:
+      - .env
     depends_on:
       - usuarios-db
       
   habitaciones-db:
-    image: postgres:alpine
-    command: sh -c "echo 'Base de datos de Habitaciones (pendiente)' && sleep infinity"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${HABITACIONES_DB_NAME}
+      POSTGRES_USER: ${HABITACIONES_DB_USER}
+      POSTGRES_PASSWORD: ${HABITACIONES_DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - habitaciones_data:/var/lib/postgresql/data
     
   habitaciones:
-    image: node:alpine
-    command: sh -c "echo 'Servicio Habitaciones (pendiente de implementar)' && sleep infinity"
+    build: ./servicios/habitaciones
+    ports:
+      - "5003:5000"
+    env_file:
+      - .env
     depends_on:
       - habitaciones-db
       
   reservas-db:
-    image: postgres:alpine
-    command: sh -c "echo 'Base de datos de Reservas (pendiente)' && sleep infinity"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${RESERVAS_DB_NAME}
+      POSTGRES_USER: ${RESERVAS_DB_USER}
+      POSTGRES_PASSWORD: ${RESERVAS_DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - reservas_data:/var/lib/postgresql/data
     
   reservas:
-    image: node:alpine
-    command: sh -c "echo 'Servicio Reservas (pendiente de implementar)' && sleep infinity"
+    build: ./servicios/reservas
+    ports:
+      - "5002:5000"
+    env_file:
+      - .env
     depends_on:
       - reservas-db
       
   pagos-db:
     image: postgres:alpine
     command: sh -c "echo 'Base de datos de Pagos (pendiente)' && sleep infinity"
-    
+
   pagos:
     image: node:alpine
     command: sh -c "echo 'Servicio Pagos (pendiente de implementar)' && sleep infinity"
@@ -58,3 +91,9 @@ services:
     command: sh -c "echo 'Servicio Notificaciones (pendiente de implementar)' && sleep infinity"
     depends_on:
       - notificaciones-db
+
+volumes:
+  reservas_data:
+  usuarios_data:
+  habitaciones_data:
+

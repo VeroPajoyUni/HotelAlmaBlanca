@@ -1,9 +1,26 @@
 import os
 import requests
 from flask import Flask, jsonify, request
-from usuarios_db import conectar
+from werkzeug.exceptions import HTTPException
+import psycopg
+from usuarios_db import conectar, crear_tabla
 
 app = Flask(__name__)
+
+
+@app.after_request
+def permitir_cors(respuesta):
+    respuesta.headers["Access-Control-Allow-Origin"] = "*"
+    respuesta.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
+    return respuesta
+
+@app.errorhandler(Exception)
+def error_interno(error):
+    if isinstance(error, HTTPException):
+        return error
+    app.logger.exception("Error inesperado")
+    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
 
 @app.route("/usuarios", methods=["GET"])
 def listarUsuarios():
@@ -52,7 +69,13 @@ def crearUsuario():
         nuevoUsuario["telefono"]
     )
 
-    cursor.execute(sql, valores)
+    try:
+        cursor.execute(sql, valores)
+    except psycopg.errors.UniqueViolation:
+        conexion.rollback()
+        cursor.close()
+        conexion.close()
+        return jsonify({"mensaje": "Ya existe un usuario con ese documento o correo"}), 409
     idNuevo = cursor.fetchone()["id"]
     conexion.commit()
 
@@ -204,4 +227,6 @@ def consultarReservasUsuario(id):
         "reservas": reservas
     }), 200
 
+
+crear_tabla()
 app.run(host="0.0.0.0", debug=True)

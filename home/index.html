@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +8,28 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- ==================== NAVEGACIÓN ==================== -->
     <header class="navbar">
 
-        <div href="#" class="navbar_logo">
+        <div class="navbar_logo">
             <img src="css/logo.png" alt="Alma Blanca">
         </div>
 
         <nav class="navbar_menu">
             <a href="#" class="navbar_link">Inicio</a>
-            <a href="#" class="navbar_link">Habitaciones</a>
-            <a href="#" class="navbar_link">Servicios</a>
-            <a href="#" class="navbar_link">Contactanos</a>
+            <a href="#habitaciones" class="navbar_link">Habitaciones</a>
+            <a href="#reservas" class="navbar_link">Reservas</a>
+            <a href="#registro" class="navbar_link">Registro</a>
         </nav>
 
-        <a href="#" class="btn-login">
+        <a href="#registro" class="btn-login">
             Iniciar sesión
         </a>
 
     </header>
     <main>
 
-        <!-- HERO -->
+        <!-- ==================== HERO ==================== -->
         <section class="hero">
 
             <div class="hero-content">
@@ -47,7 +48,7 @@
                     una experiencia de descanso y tranquilidad.
                 </p>
 
-                <a href="#servicios" class="btn-reservar">
+                <a href="#buscador" class="btn-reservar">
                     Reservar ahora
                 </a>
 
@@ -55,31 +56,46 @@
 
         </section>
 
-        <section class="buscador">
+        <!-- ==================== BUSCADOR (Reservas + Habitaciones + Usuarios) ==================== -->
+        <section class="buscador" id="buscador">
 
             <h2>
                 Encuentra tu habitación
             </h2>
 
-            <form class="forma-buscador">
+            <form class="forma-buscador" id="form-buscar">
 
                 <div>
-                    <label>Entrada</label>
-                    <input type="date">
+                    <label for="entrada">Entrada</label>
+                    <input type="date" id="entrada" required>
                 </div>
 
                 <div>
-                    <label>Salida</label>
-                    <input type="date">
+                    <label for="salida">Salida</label>
+                    <input type="date" id="salida" required>
                 </div>
 
                 <div>
-                    <label>Huéspedes</label>
-                    <select>
-                        <option>1 huésped</option>
-                        <option>2 huéspedes</option>
-                        <option>3 huéspedes</option>
-                        <option>4 huéspedes</option>
+                    <label for="huespedes">Huéspedes</label>
+                    <select id="huespedes">
+                        <option value="1">1 huésped</option>
+                        <option value="2">2 huéspedes</option>
+                        <option value="3">3 huéspedes</option>
+                        <option value="4">4 huéspedes</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="habitacion">Habitación</label>
+                    <select id="habitacion">
+                        <option value="">Cargando...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="usuario">Huésped titular</label>
+                    <select id="usuario">
+                        <option value="">Cargando...</option>
                     </select>
                 </div>
 
@@ -89,10 +105,101 @@
 
             </form>
 
+            <p id="mensaje-buscar" class="mensaje"></p>
+
+            <button id="btn-confirmar" class="btn-reservar" hidden>
+                Confirmar reserva
+            </button>
+
+        </section>
+
+        <!-- ==================== HABITACIONES (servicio Habitaciones) ==================== -->
+        <section class="seccion" id="habitaciones">
+
+            <h2>
+                Nuestras habitaciones
+            </h2>
+
+            <div class="tarjetas" id="lista-habitaciones"></div>
+
+        </section>
+
+        <!-- ==================== RESERVAS (servicio Reservas) ==================== -->
+        <section class="seccion" id="reservas">
+
+            <h2>
+                Reservas registradas
+            </h2>
+
+            <p id="mensaje-reservas" class="mensaje"></p>
+
+            <div class="tabla-contenedor">
+                <table class="tabla-reservas">
+                    <thead>
+                        <tr>
+                            <th>N.º</th>
+                            <th>Huésped</th>
+                            <th>Habitación</th>
+                            <th>Entrada</th>
+                            <th>Salida</th>
+                            <th>Personas</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-reservas"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ==================== REGISTRO (servicio Usuarios) ==================== -->
+        <section class="seccion" id="registro">
+
+            <h2>
+                Regístrate como huésped
+            </h2>
+
+            <form class="forma-buscador" id="form-registro">
+
+                <div>
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" required>
+                </div>
+
+                <div>
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" required>
+                </div>
+
+                <div>
+                    <label for="documento">Documento</label>
+                    <input type="text" id="documento" required>
+                </div>
+
+                <div>
+                    <label for="email">Correo</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div>
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+
+                <button type="submit">
+                    Registrarme
+                </button>
+
+            </form>
+
+            <p id="mensaje-registro" class="mensaje"></p>
+
         </section>
     </main>
 
-        <footer id="contacto">
+    <!-- ==================== FOOTER ==================== -->
+    <footer id="contacto">
 
         <div class="logo">
             ALMA BLANCA
@@ -101,19 +208,21 @@
         <p>
             Hotel Alma Blanca
         </p>
-            <div class="integrantes">
-                
-                <p>DANILO COLLAZOS ALEGRÍA</p>
-                <p>MAIRA GARCÍA RIVERA</p>
-                <p>ANDRÉS CASANOVA RENGIFO</p>
-                <p>YISEL VERÓNICA PAJOY MACA</p>
 
-            </div>
+        <div class="integrantes">
+            <p>DANILO COLLAZOS ALEGRÍA</p>
+            <p>MAIRA GARCÍA RIVERA</p>
+            <p>ANDRÉS CASANOVA RENGIFO</p>
+            <p>YISEL VERÓNICA PAJOY MACA</p>
+        </div>
 
         <p>
             © 2026 Todos los derechos reservados.
         </p>
 
     </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script src="js/app.js"></script>
 </body>
 </html>

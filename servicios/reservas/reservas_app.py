@@ -3,12 +3,29 @@ import os
 from flask import Flask, jsonify, request
 import requests
 from psycopg.rows import dict_row
-from reservas_db import conectar
+from werkzeug.exceptions import HTTPException
+from reservas_db import conectar, crear_tabla
 
 habitaciones_url = os.getenv("HABITACIONES_URL")
 usuarios_url = os.getenv("USUARIOS_URL")
 
 app = Flask(__name__)
+
+
+@app.after_request
+def permitir_cors(respuesta):
+    respuesta.headers["Access-Control-Allow-Origin"] = "*"
+    respuesta.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
+    return respuesta
+
+
+@app.errorhandler(Exception)
+def error_interno(error):
+    if isinstance(error, HTTPException):
+        return error
+    app.logger.exception("Error inesperado")
+    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
 
 def consultar_servicio(url, recurso, id):
     respuesta = requests.get(
@@ -222,4 +239,6 @@ def actualizar(id):
 
     return jsonify({"mensaje": "Reserva actualizada correctamente"})
 
+
+crear_tabla()
 app.run(host="0.0.0.0", port=5000, debug=True)
