@@ -1,11 +1,8 @@
 import os
 import time
 
-# Conector para PostgreSQL
 import psycopg
 
-
-# ---------- Conexión a PostgreSQL (reintenta mientras la base de datos arranca) ----------
 def conectar():
     for intento in range(10):
         try:
@@ -23,8 +20,6 @@ def conectar():
                 raise
             time.sleep(3)
 
-
-# ---------- Creación de la tabla y reserva de ejemplo (solo si no existen) ----------
 def crear_tabla():
     conexion = conectar()
     cursor = conexion.cursor()
@@ -47,8 +42,3 @@ def crear_tabla():
     conexion.commit()
     cursor.close()
     conexion.close()
-
-# Para revisar la base de datos manualmente:
-# docker compose exec reservas-db psql -U reservas -d reservas
-#   \dt           -- listar las tablas
-#   \d reservas   -- ver las columnas de la tabla

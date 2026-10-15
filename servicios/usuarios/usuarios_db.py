@@ -4,8 +4,6 @@ import time
 import psycopg
 from psycopg.rows import dict_row
 
-
-# ---------- Conexión a PostgreSQL (reintenta mientras la base de datos arranca) ----------
 def conectar():
     for intento in range(10):
         try:
@@ -24,8 +22,6 @@ def conectar():
                 raise
             time.sleep(3)
 
-
-# ---------- Creación de la tabla y datos de ejemplo (solo si no existen) ----------
 def crear_tabla():
     conexion = conectar()
     cursor = conexion.cursor()
@@ -53,6 +49,3 @@ def crear_tabla():
     conexion.commit()
     cursor.close()
     conexion.close()
-
-# Para revisar la base de datos manualmente:
-# docker compose exec usuarios-db psql -U usuarios -d usuarios

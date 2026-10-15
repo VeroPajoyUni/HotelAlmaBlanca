@@ -5,7 +5,7 @@ from habitaciones_db import conectar, crear_tabla
 
 app = Flask(__name__)
 
-# ---------- CORS: permite que la página Home (otro puerto) consuma esta API ----------
+
 @app.after_request
 def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Origin"] = "*"
@@ -13,7 +13,7 @@ def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
     return respuesta
 
-# ---------- Errores inesperados: responder en JSON para que el navegador pueda leerlos ----------
+
 @app.errorhandler(Exception)
 def error_interno(error):
     if isinstance(error, HTTPException):
@@ -138,7 +138,5 @@ def eliminar(id):
 
     return jsonify({"mensaje": "Habitación eliminada correctamente"})
 
-
-# ---------- Arranque: crear la tabla si no existe y encender el servidor ----------
 crear_tabla()
 app.run(host="0.0.0.0", port=5000, debug=True)
