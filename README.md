@@ -22,6 +22,12 @@ Nuestro proyecto se basa en la arquitectura de **microservicios**. El **Cliente*
 
 La arquitectura contempla los microservicios de **Usuarios, Habitaciones, Reservas, Pagos y Notificaciones**, cada uno encargado de una funcionalidad específica del sistema. A su vez, cada microservicio cuenta con su **propia base de datos**, manteniendo el aislamiento de la información y evitando que otros servicios accedan directamente a ella.
 
+### Implementación en este avance
+
+En el estado actual, los servicios de Usuarios, Habitaciones y Reservas tienen una aplicación funcional y una base de datos PostgreSQL propia. El API Gateway, Pagos y Notificaciones todavía están declarados como marcadores en Docker Compose y no realizan sus funciones.
+
+La vista Home se comunica directamente con Usuarios, Habitaciones y Reservas.
+
 ## Servicios del sistema
 
 * **Servicio de Usuarios:** Gestiona el registro y la información de clientes, recepcionistas y administradores.
@@ -32,6 +38,14 @@ La arquitectura contempla los microservicios de **Usuarios, Habitaciones, Reserv
 
 Los servicios pueden trabajar de forma independiente. Entre los procesos independientes se encuentran la autenticación, la disponibilidad de habitaciones y el envío de notificaciones.
 
+### Avance de los servicios
+
+En este avance:
+* Usuarios permite consultar, registrar, actualizar y eliminar usuarios.
+* Habitaciones permite consultar, registrar, actualizar y eliminar habitaciones.
+* Reservas permite consultar, crear, actualizar y eliminar reservas, revisar la disponibilidad y consultar detalles de una reserva.
+* Pagos, Notificaciones y el API Gateway siguen pendientes de implementación. Aunque el servicio de Usuarios guarda un rol para cada persona, el inicio de sesión y el control de permisos todavía no están implementados.
+
 ## Comunicación entre servicios
 
 Los servicios se comunican entre sí cuando necesitan información para completar un proceso.
@@ -41,20 +55,36 @@ Los servicios se comunican entre sí cuando necesitan información para completa
 * **Pagos → Reservas:** Solicita los datos de la reserva para verificar que exista y conocer el total que debe cobrarse.
 * **Habitaciones, Usuarios y Reservas:** Responden a las solicitudes entregando la información correspondiente.
 
+### Comunicación implementada
+
+Los servicios que ya tienen aplicación se comunican mediante solicitudes HTTP y envían o reciben datos en formato JSON. Para crear una reserva, Reservas consulta a Usuarios y Habitaciones para comprobar que existan. También puede consultar la disponibilidad y reunir los datos del usuario y de la habitación para mostrar el detalle de una reserva.
+
+La página Home consulta a Usuarios y Habitaciones, y envía las solicitudes relacionadas con las reservas. En este momento se comunica directamente con esos servicios, no por medio del API Gateway.
+
 ## Docker Compose
-Para levantar la estructura inicial del proyecto:
+Para levantar la estructura del proyecto:
 ```
 docker compose up --build
 ```
-Esto construye la imagen de `home` a partir de su Dockerfile y publica la vista en `http://localhost:3000`. Los demás servicios (`usuarios`, `habitaciones`, `reservas`, `pagos`, `notificaciones`) también se levantan, sobre `node:alpine`, pero por ahora solo mantienen un contenedor activo como marcador de su lugar en la arquitectura, sin lógica de negocio.
+El comando construye las imágenes que tienen un Dockerfile y levanta los contenedores definidos en `docker-compose.yml`. La vista Home está disponible en `http://localhost:3000`. Los servicios de Usuarios, Habitaciones y Reservas son aplicaciones Python y se publican, respectivamente, en los puertos `5001`, `5003` y `5002`.
 
-Cada uno de esos servicios tiene además un servicio `*-db` asociado sobre `postgres:alpine` (`usuarios-db`, `habitaciones-db`, `reservas-db`, `pagos-db`) o `redis:alpine` (`notificaciones-db`), declarado con `depends_on` para dejar explícita la regla de "una base de datos por microservicio". En todos los casos se sobreescribe el comando por defecto de la imagen para que el contenedor solo se mantenga activo, sin llegar a inicializar un servidor de base de datos real, siguen siendo marcadores de posición hasta el siguiente avance que se nos indique.
+Las bases de datos PostgreSQL de Usuarios, Habitaciones y Reservas se publican en los puertos `5434`, `5435` y `5433`. Docker Compose las conecta con sus servicios y usa volúmenes para guardar sus datos: `usuarios_data`, `habitaciones_data` y `reservas_data`. Estos volúmenes ayudan a conservar los datos cuando los contenedores se detienen o se vuelven a crear. No se deben borrar los volúmenes si se quiere conservar esa información.
+
+El API Gateway, Pagos y Notificaciones, junto con sus bases de datos, siguen siendo contenedores marcadores: muestran un mensaje y quedan activos, pero todavía no ejecutan la lógica real del sistema.
+
+### Variables de entorno
+
+Los servicios leen la configuración de sus bases de datos y las direcciones de otros servicios desde variables de entorno. El archivo `.env.example` muestra los nombres de las variables necesarias; `.env` contiene la configuración local.
 
 ## Estado actual
-- **Diseñado:** Arquitectura completa de microservicios (5 servicios y API Gateway), roles de usuario, comunicación entre servicios.
-- **Configurado:** `docker-compose.yml` con todos los servicios y sus respectivas bases de datos declarados, incluyendo la dependencia `depends_on` de cada servicio hacia su propia base de datos.
-- **Implementado:** Vista Home contenerizada y funcionando (`Dockerfile` e `index.html`).
-- **Pendiente:** API Gateway, lógica interna de cada microservicio, bases de datos, autenticación, pagos y notificaciones reales, los cuales se realizarán de acuerdo al siguiente avance que se nos indique.
+- **Diseñado:** Arquitectura de microservicios con los servicios de Usuarios, Habitaciones, Reservas, Pagos y Notificaciones, además de un API Gateway planeado.
+- **Configurado:** `docker-compose.yml` define la página, los servicios, las bases de datos y los puertos. También establece las variables de entorno y la conexión de cada base de datos con su servicio.
+- **Implementado:** Vista Home contenerizada; servicios funcionales de Usuarios, Habitaciones y Reservas; bases PostgreSQL independientes para esos tres servicios; comunicación HTTP con JSON; y volúmenes para conservar los datos de esas bases.
+- **Pendiente:** Implementar el API Gateway y conectarlo con la página; desarrollar Pagos y Notificaciones con bases de datos reales; agregar inicio de sesión y control de permisos; y completar pruebas, validaciones y copias de seguridad.
+
+### Segundo avance
+
+En este avance se pasó del diseño inicial a una primera versión funcional de Usuarios, Habitaciones y Reservas. Los servicios guardan información en sus propias bases de datos PostgreSQL, se comunican entre sí por HTTP y JSON cuando necesitan datos, y Docker Compose permite levantarlos junto con la vista Home. Los volúmenes aplican lo visto en clase sobre guardar la información de forma persistente, en lugar de dejarla solo en la memoria del programa.
 
 ## Tipo de arquitectura
 
@@ -82,6 +112,14 @@ La información que debe almacenarse incluye:
 Los datos más críticos son los relacionados con **reservas y pagos**, ya que permiten conocer qué habitaciones están ocupadas y cuáles han sido pagadas.
 
 La pérdida de esta información podría generar problemas como pérdida de reservas, errores en el registro de habitaciones ocupadas o cobradas, sobreventa y reclamos por parte de los clientes.
+
+### Bases de datos y volúmenes implementados
+
+En este avance, Usuarios, Habitaciones y Reservas usan bases PostgreSQL independientes. Al iniciar, cada servicio prepara sus tablas si todavía no existen y carga algunos datos de ejemplo.
+
+Docker Compose configura un volumen para cada una de esas bases: `usuarios_data`, `habitaciones_data` y `reservas_data`. El volumen conserva los archivos de la base de datos aunque se detenga o se vuelva a crear el contenedor. Los volúmenes no reemplazan las copias de seguridad.
+
+Las bases de datos de Pagos y Notificaciones todavía son marcadores y no guardan información real.
 
 ## Usuarios del sistema
 
