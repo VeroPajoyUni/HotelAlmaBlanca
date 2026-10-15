@@ -46,80 +46,15 @@ Para levantar la estructura inicial del proyecto:
 ```
 docker compose up --build
 ```
-Esto construye la imagen de `home` a partir de su Dockerfile y publica la vista en `http://localhost:3000`. El servicio `reservas` se ejecuta con Flask y PostgreSQL; `usuarios`, `habitaciones`, `pagos` y `notificaciones`, además del API Gateway, siguen siendo marcadores de posición.
+Esto construye la imagen de `home` a partir de su Dockerfile y publica la vista en `http://localhost:3000`. Los demás servicios (`usuarios`, `habitaciones`, `reservas`, `pagos`, `notificaciones`) también se levantan, sobre `node:alpine`, pero por ahora solo mantienen un contenedor activo como marcador de su lugar en la arquitectura, sin lógica de negocio.
 
-`reservas-db` inicializa PostgreSQL en su puerto estándar `5432` dentro de Docker y conserva sus datos en el volumen `reservas_data`. Desde el equipo anfitrión se publica en el puerto `5433`, configurado directamente en `docker-compose.yml`. La configuración está en `.env`; usa `.env.example` como plantilla y cambia la contraseña antes de desplegar. `.env` está excluido de Git. Para evitar conflictos, se reservaron los puertos externos `5434` para Usuarios, `5435` para Habitaciones, `5436` para Pagos y `5437` para Notificaciones/Redis, configurados directamente en Compose cuando esos servicios se activen. Dentro de Docker, PostgreSQL usará `5432` en cada servicio y Redis `6379`.
-
-### API de Reservas
-
-El servicio administra las reservas y sus fechas; los datos del huésped y de la habitación pertenecen a sus respectivos microservicios. Queda disponible en `http://localhost:5002` y recibe y responde JSON.
-
-| Método y endpoint | Entrada | Respuesta |
-|---|---|---|
-| `GET /reservas` | Ninguna | Lista de reservas. |
-| `GET /reservas/<id>` | ID en la ruta | Datos de la reserva o `404` si no existe. |
-| `GET /reservas/<id>/detalles` | ID en la ruta | Datos de la reserva junto con los datos del usuario y la habitación consultados a sus servicios. |
-| `GET /reservas/disponibilidad?habitacion_id=<id>&fecha_entrada=AAAA-MM-DD&fecha_salida=AAAA-MM-DD` | ID de habitación y fechas | `{"disponible": true/false}` según las reservas almacenadas. |
-| `POST /reservas` | JSON con los campos indicados abajo | `201` y el ID creado; `404` si no existe el usuario o la habitación; `409` si la habitación ya está reservada en ese intervalo. |
-| `PUT /reservas/<id>` | ID en la ruta y JSON completo con los campos indicados abajo | Confirmación de actualización; `404` si no existe el usuario o la habitación; `409` si la habitación ya está reservada en ese intervalo. |
-| `DELETE /reservas/<id>` | ID en la ruta | Elimina la reserva de la base de datos. |
-
-El JSON requerido por `POST` y `PUT` tiene esta forma:
-
-```json
-{
-  "usuario_id": 1,
-  "habitacion_id": 101,
-  "fecha_entrada": "2026-12-20",
-  "fecha_salida": "2026-12-23",
-  "huespedes": 2
-}
-```
-
-La tabla `reservas` almacena `id`, `usuario_id`, `habitacion_id`, `fecha_entrada`, `fecha_salida`, `huespedes` y `estado`. Al iniciar el servicio se agrega una reserva de ejemplo (`usuario_id=1`, `habitacion_id=1`, fechas `2026-12-20` a `2026-12-23`, 2 huéspedes) si ese registro aún no existe. `DELETE` elimina físicamente el registro; los ID de usuario y habitación son referencias a otros servicios, no claves foráneas entre bases de datos. El endpoint consulta las reservas existentes antes de crear o actualizar otra para la misma habitación, pero las fechas no tienen una validación adicional en el código ni una restricción avanzada de solapamiento en PostgreSQL. Si la base ya existía, al iniciar también se quitan las restricciones anteriores de fechas y solapamientos.
-
-Siguiendo el ejemplo de clase, `POST` y `PUT` reciben el JSON directamente y no revisan previamente que tenga todos los campos o que cada valor tenga el formato esperado. Envía el objeto JSON mostrado arriba.
-
-### Variables de entorno de Reservas
-
-El contenedor de Reservas obtiene estas variables de `.env`:
-
-| Variable | Uso |
-|---|---|
-| `RESERVAS_DB_HOST` | Nombre del contenedor de PostgreSQL (`reservas-db`). |
-| `RESERVAS_DB_PORT` | Puerto PostgreSQL de Reservas dentro de Compose (`5432`). |
-| `RESERVAS_DB_USER` | Usuario de la base de datos de Reservas. |
-| `RESERVAS_DB_PASSWORD` | Contraseña de ese usuario. |
-| `RESERVAS_DB_NAME` | Nombre de la base de datos (`reservas`). |
-| `HABITACIONES_URL` | URL interna del servicio Habitaciones (`http://habitaciones:5000`). |
-| `USUARIOS_URL` | URL interna del servicio Usuarios (`http://usuarios:5000`). |
-
-### Comunicación con otros servicios
-
-Reservas consulta por HTTP los endpoints `GET /habitaciones/<id>` y `GET /usuarios/<id>` al mostrar detalles y antes de crear o actualizar una reserva. Si el servicio correspondiente responde `404`, Reservas devuelve `404`; si responde con otro código distinto de `200`, devuelve `503`. Las solicitudes tienen un tiempo máximo de espera de cinco segundos.
-
-Habitaciones todavía no ofrece un endpoint de disponibilidad por fechas. Por eso, Reservas valida los solapamientos consultando las reservas almacenadas en su propia base de datos y consulta a Habitaciones para confirmar que la habitación exista. La consulta local de disponibilidad no protege contra solicitudes concurrentes.
-
-| Solicitante | Servicio que responde | Endpoint previsto | Información enviada | Información requerida |
-|---|---|---|---|---|
-| Reservas | Habitaciones | `GET /habitaciones/<habitacion_id>` | ID de habitación. | Confirma que la habitación exista y obtiene sus datos. |
-| Reservas | Usuarios | `GET /usuarios/<usuario_id>` | ID de usuario. | Confirma que el usuario exista y obtiene sus datos. |
-| Pagos (futuro consumidor) | Reservas | `GET /reservas/<id>` | ID de reserva. | Datos actuales de la reserva; hoy no incluyen el valor total. |
-
-Para integrar Pagos aún debe definirse de dónde sale el precio total y cómo se expondrá.
-
-### Ejecución y verificación
-
-Desde la raíz del repositorio, ejecutar `docker compose up --build`. La página Home queda en `http://localhost:3000` y la API de Reservas en `http://localhost:5002`. Compose inicia `reservas-db` y monta `reservas_data` para persistir la información. Los demás servicios siguen siendo marcadores de posición.
-
-Se puede probar `GET http://localhost:5002/reservas` para listar reservas y enviar el JSON anterior con `POST http://localhost:5002/reservas` para crear una. También se puede comprobar `GET /reservas/disponibilidad` usando los parámetros indicados en la tabla.
+Cada uno de esos servicios tiene además un servicio `*-db` asociado sobre `postgres:alpine` (`usuarios-db`, `habitaciones-db`, `reservas-db`, `pagos-db`) o `redis:alpine` (`notificaciones-db`), declarado con `depends_on` para dejar explícita la regla de "una base de datos por microservicio". En todos los casos se sobreescribe el comando por defecto de la imagen para que el contenedor solo se mantenga activo, sin llegar a inicializar un servidor de base de datos real, siguen siendo marcadores de posición hasta el siguiente avance que se nos indique.
 
 ## Estado actual
 - **Diseñado:** Arquitectura completa de microservicios (5 servicios y API Gateway), roles de usuario, comunicación entre servicios.
-- **Configurado:** `docker-compose.yml` con los servicios de la arquitectura declarados; PostgreSQL real y volumen están habilitados para Reservas.
+- **Configurado:** `docker-compose.yml` con todos los servicios y sus respectivas bases de datos declarados, incluyendo la dependencia `depends_on` de cada servicio hacia su propia base de datos.
 - **Implementado:** Vista Home contenerizada y funcionando (`Dockerfile` e `index.html`).
-- **Implementado:** Servicio de Reservas con persistencia PostgreSQL, API REST básica y control de solapamientos.
-- **Pendiente:** Integraciones HTTP de Reservas con Usuarios y Habitaciones, servicios restantes, API Gateway, autenticación, pagos y notificaciones reales.
+- **Pendiente:** API Gateway, lógica interna de cada microservicio, bases de datos, autenticación, pagos y notificaciones reales, los cuales se realizarán de acuerdo al siguiente avance que se nos indique.
 
 ## Tipo de arquitectura
 
