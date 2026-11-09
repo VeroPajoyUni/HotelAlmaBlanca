@@ -65,6 +65,21 @@ def consultar_servicio(url, recurso, id):
         mensaje = "Usuario no encontrado" if recurso == "usuarios" else "Habitación no encontrada"
         return None, (jsonify({"mensaje": mensaje}), 404)
     if respuesta.status_code != 200:
+        return None, (jsonify({"mensaje": f"Respuesta inesperada del servicio de {recurso}"}), 502)
+    return datos, None
+
+
+@app.route("/reservas/circuito")
+def estado_circuito():
+    return jsonify({
+        recurso: {
+            "estado": circuito.current_state.upper(),
+            "fallos_consecutivos": circuito.fail_counter,
+            "umbral_fallos": circuito.fail_max,
+            "periodo_recuperacion_s": circuito.reset_timeout,
+        }
+        for recurso, circuito in circuitos.items()
+    }), 200
 
 def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, reserva_id=None):
     sql = """
@@ -85,6 +100,7 @@ def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, re
 
 @app.route("/reservas")
 def listar():
+    time.sleep(int(os.getenv("RESERVAS_DELAY", "0")))
     conexion = conectar()
     cursor = conexion.cursor(row_factory=dict_row)
     sql = "SELECT * FROM reservas ORDER BY id"
