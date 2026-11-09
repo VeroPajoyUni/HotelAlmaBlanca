@@ -37,16 +37,34 @@ def permitir_cors(respuesta):
 
 
 def consultar_servicio(url, recurso, id):
-    respuesta = requests.get(
-        f"{url.rstrip('/')}/{recurso}/{id}",
-        timeout=5
-    )
+    timeout = int(os.getenv(f"{recurso.upper()}_TIMEOUT", "2"))
+
+    try:
+        with circuitos[recurso].calling():
+            respuesta = requests.get(
+                f"{url.rstrip('/')}/{recurso}/{id}",
+                timeout=timeout,
+            )
+            if respuesta.status_code >= 500:
+                respuesta.raise_for_status()
+            datos = respuesta.json() if respuesta.status_code == 200 else None
+    except pybreaker.CircuitBreakerError:
+        return None, (jsonify({"mensaje": f"Circuito abierto: {recurso} no será consultado"}), 503)
+    except requests.exceptions.Timeout:
+        return None, (jsonify({"mensaje": f"El servicio de {recurso} tardó demasiado en responder"}), 504)
+    except requests.exceptions.ConnectionError:
+        return None, (jsonify({"mensaje": f"El servicio de {recurso} no está disponible"}), 503)
+    except requests.exceptions.HTTPError:
+        return None, (jsonify({"mensaje": f"Error del servidor de {recurso}"}), 502)
+    except requests.exceptions.RequestException:
+        return None, (jsonify({"mensaje": f"Error al consultar el servicio de {recurso}"}), 502)
+    except ValueError:
+        return None, (jsonify({"mensaje": f"Respuesta inválida del servicio de {recurso}"}), 502)
+
     if respuesta.status_code == 404:
         mensaje = "Usuario no encontrado" if recurso == "usuarios" else "Habitación no encontrada"
         return None, (jsonify({"mensaje": mensaje}), 404)
     if respuesta.status_code != 200:
-        return None, (jsonify({"mensaje": f"Error al consultar el servicio de {recurso}"}), 503)
-    return respuesta.json(), None
 
 def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, reserva_id=None):
     sql = """
