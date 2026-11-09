@@ -12,6 +12,21 @@ usuarios_url = os.getenv("USUARIOS_URL")
 
 app = Flask(__name__)
 
+circuito_usuarios = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+circuito_habitaciones = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+circuitos = {
+    "usuarios": circuito_usuarios,
+    "habitaciones": circuito_habitaciones,
+}
+
 
 @app.after_request
 def permitir_cors(respuesta):
