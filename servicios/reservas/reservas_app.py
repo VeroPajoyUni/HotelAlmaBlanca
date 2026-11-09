@@ -1,9 +1,10 @@
 import os
+import time
 
 from flask import Flask, jsonify, request
 import requests
+import pybreaker
 from psycopg.rows import dict_row
-from werkzeug.exceptions import HTTPException
 from reservas_db import conectar, crear_tabla
 
 habitaciones_url = os.getenv("HABITACIONES_URL")
@@ -19,13 +20,6 @@ def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
     return respuesta
 
-
-@app.errorhandler(Exception)
-def error_interno(error):
-    if isinstance(error, HTTPException):
-        return error
-    app.logger.exception("Error inesperado")
-    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
 
 def consultar_servicio(url, recurso, id):
     respuesta = requests.get(
