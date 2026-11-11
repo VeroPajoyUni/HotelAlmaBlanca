@@ -1,9 +1,6 @@
-
 import os
 import time
-
 import psycopg
-
 
 def conectar():
     for intento in range(10):
@@ -22,10 +19,8 @@ def conectar():
                 f"La base de datos se está conectando... "
                 f"intento {intento + 1}."
             )
-
             if intento == 9:
                 raise
-
             time.sleep(3)
 
 
