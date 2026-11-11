@@ -1,15 +1,31 @@
 import os
+import time
 
 from flask import Flask, jsonify, request
 import requests
+import pybreaker
 from psycopg.rows import dict_row
-from werkzeug.exceptions import HTTPException
 from reservas_db import conectar, crear_tabla
 
 habitaciones_url = os.getenv("HABITACIONES_URL")
 usuarios_url = os.getenv("USUARIOS_URL")
 
 app = Flask(__name__)
+
+circuito_usuarios = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+circuito_habitaciones = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+circuitos = {
+    "usuarios": circuito_usuarios,
+    "habitaciones": circuito_habitaciones,
+}
 
 
 @app.after_request
@@ -20,24 +36,50 @@ def permitir_cors(respuesta):
     return respuesta
 
 
-@app.errorhandler(Exception)
-def error_interno(error):
-    if isinstance(error, HTTPException):
-        return error
-    app.logger.exception("Error inesperado")
-    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
-
 def consultar_servicio(url, recurso, id):
-    respuesta = requests.get(
-        f"{url.rstrip('/')}/{recurso}/{id}",
-        timeout=5
-    )
+    timeout = int(os.getenv(f"{recurso.upper()}_TIMEOUT", "2"))
+
+    try:
+        with circuitos[recurso].calling():
+            respuesta = requests.get(
+                f"{url.rstrip('/')}/{recurso}/{id}",
+                timeout=timeout,
+            )
+            if respuesta.status_code >= 500:
+                respuesta.raise_for_status()
+            datos = respuesta.json() if respuesta.status_code == 200 else None
+    except pybreaker.CircuitBreakerError:
+        return None, (jsonify({"mensaje": f"Circuito abierto: {recurso} no será consultado"}), 503)
+    except requests.exceptions.Timeout:
+        return None, (jsonify({"mensaje": f"El servicio de {recurso} tardó demasiado en responder"}), 504)
+    except requests.exceptions.ConnectionError:
+        return None, (jsonify({"mensaje": f"El servicio de {recurso} no está disponible"}), 503)
+    except requests.exceptions.HTTPError:
+        return None, (jsonify({"mensaje": f"Error del servidor de {recurso}"}), 502)
+    except requests.exceptions.RequestException:
+        return None, (jsonify({"mensaje": f"Error al consultar el servicio de {recurso}"}), 502)
+    except ValueError:
+        return None, (jsonify({"mensaje": f"Respuesta inválida del servicio de {recurso}"}), 502)
+
     if respuesta.status_code == 404:
         mensaje = "Usuario no encontrado" if recurso == "usuarios" else "Habitación no encontrada"
         return None, (jsonify({"mensaje": mensaje}), 404)
     if respuesta.status_code != 200:
-        return None, (jsonify({"mensaje": f"Error al consultar el servicio de {recurso}"}), 503)
-    return respuesta.json(), None
+        return None, (jsonify({"mensaje": f"Respuesta inesperada del servicio de {recurso}"}), 502)
+    return datos, None
+
+
+@app.route("/reservas/circuito")
+def estado_circuito():
+    return jsonify({
+        recurso: {
+            "estado": circuito.current_state.upper(),
+            "fallos_consecutivos": circuito.fail_counter,
+            "umbral_fallos": circuito.fail_max,
+            "periodo_recuperacion_s": circuito.reset_timeout,
+        }
+        for recurso, circuito in circuitos.items()
+    }), 200
 
 def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, reserva_id=None):
     sql = """
@@ -58,6 +100,7 @@ def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, re
 
 @app.route("/reservas")
 def listar():
+    time.sleep(int(os.getenv("RESERVAS_DELAY", "0")))
     conexion = conectar()
     cursor = conexion.cursor(row_factory=dict_row)
     sql = "SELECT * FROM reservas ORDER BY id"
