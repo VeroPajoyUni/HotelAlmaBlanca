@@ -16,6 +16,21 @@ def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
     return respuesta
 
+circuito_reservas = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+
+@app.route("/usuarios/circuito")
+def estado_circuito():
+    return jsonify({
+        "estado": circuito_reservas.current_state.upper(),
+        "fallos_consecutivos": circuito_reservas.fail_counter,
+        "umbral_fallos": circuito_reservas.fail_max,
+        "periodo_recuperacion_s": circuito_reservas.reset_timeout,
+    }), 200
+
 
 @app.route("/usuarios", methods=["GET"])
 def listarUsuarios():
