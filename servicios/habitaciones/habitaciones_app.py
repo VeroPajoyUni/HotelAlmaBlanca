@@ -15,13 +15,6 @@ def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
     return respuesta
 
-
-@app.errorhandler(Exception)
-def error_interno(error):
-    if isinstance(error, HTTPException):
-        return error
-    app.logger.exception("Error inesperado")
-    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
 app.json.ensure_ascii = False
 
 @app.route("/health")
