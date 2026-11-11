@@ -1,4 +1,5 @@
 import time
+import os 
 
 from flask import Flask, jsonify, request
 from psycopg.rows import dict_row
