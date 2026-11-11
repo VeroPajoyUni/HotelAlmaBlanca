@@ -218,11 +218,44 @@
                             <th>Salida</th>
                             <th>Personas</th>
                             <th>Estado</th>
+                            <th>Pago</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody id="lista-reservas"></tbody>
                 </table>
+            </div>
+
+            <div class="pago" id="pago">
+                <h3>Pagar una reserva</h3>
+                <p>El total se calcula con las noches de la reserva y el precio por noche de la habitación.</p>
+
+                <div id="aviso-pagos" class="aviso" role="status" hidden></div>
+
+                <form class="forma-buscador" id="form-pago">
+                    <div>
+                        <label for="reserva-pago">Reserva</label>
+                        <select id="reserva-pago">
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="metodo-pago">Método de pago</label>
+                        <select id="metodo-pago">
+                            <option>Tarjeta de crédito</option>
+                            <option>Tarjeta débito</option>
+                            <option>PSE</option>
+                            <option>Efectivo en recepción</option>
+                        </select>
+                    </div>
+
+                    <button type="submit">
+                        Pagar
+                    </button>
+                </form>
+
+                <p id="mensaje-pago" class="mensaje"></p>
             </div>
 
         </section>
