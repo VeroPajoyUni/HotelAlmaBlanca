@@ -100,7 +100,6 @@ def habitacion_disponible(cursor, habitacion_id, fecha_entrada, fecha_salida, re
 
 @app.route("/reservas")
 def listar():
-    time.sleep(int(os.getenv("RESERVAS_DELAY", "0")))
     conexion = conectar()
     cursor = conexion.cursor(row_factory=dict_row)
     sql = "SELECT * FROM reservas ORDER BY id"
