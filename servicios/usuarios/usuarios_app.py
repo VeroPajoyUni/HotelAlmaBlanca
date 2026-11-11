@@ -226,12 +226,6 @@ def consultarReservasUsuario(id):
     if usuario is None:
         return jsonify({"mensaje": "Usuario no encontrado"}), 404
     reservasUrl = os.getenv("RESERVAS_URL", "http://localhost:5002")
-    respuesta = requests.get(
-        f"{reservasUrl.rstrip('/')}/reservas",
-        params={"usuario_id": id},
-        timeout=5
-    )
-    reservas = respuesta.json()
     return jsonify({
         "usuario": usuario,
         "reservas": reservas
