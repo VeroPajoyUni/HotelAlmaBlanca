@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, jsonify, request
 from psycopg.rows import dict_row
 from werkzeug.exceptions import HTTPException
