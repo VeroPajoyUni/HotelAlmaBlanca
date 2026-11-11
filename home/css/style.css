@@ -1,3 +1,25 @@
+/* ==================== BASE ==================== */
+:root {
+    --color-primary: #b89b67;
+    --color-primary-dark: #8a6f42;
+
+    --color-dark: #242321;
+    --color-text: #55524d;
+    --color-light: #f7f5f0;
+    --color-white: #ffffff;
+    --color-border: #e5e1d8;
+
+    --color-ok: #2f6b3a;
+    --color-error: #a23b2a;
+
+    --font-title: Georgia, "Times New Roman", serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+
+    --border-radius: 4px;
+    --ancho: 1100px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,119 +28,129 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 80px;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    color: black;
-    background: white;
+    font-family: var(--font-body);
+    color: var(--color-dark);
+    background: var(--color-white);
     line-height: 1.6;
 }
 
 a {
+    color: inherit;
     text-decoration: none;
-    color: black;
 }
 
 img {
     display: block;
-    width: 100%;
+    max-width: 100%;
 }
 
-:root {
-    --color-primary: #b89b67;
-    --color-primary-dark: #967b4d;
-
-    --color-dark: #242321;
-    --color-text: #55524d;
-    --color-light: #f7f5f0;
-    --color-white: #ffffff;
-    --color-border: #e5e1d8;
-
-    --font-title: Georgia, "Times New Roman", serif;
-    --font-body: Arial, Helvetica, sans-serif;
-
-    --border-radius: 4px;
-
-    --container: 1200px;
-
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+[hidden] {
+    display: none !important;
 }
 
-/* navegador principal*/
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.subtitulo {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-primary-dark);
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-family: var(--font-title);
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--color-dark);
+}
+
+
+/* ==================== NAVEGACIÓN ==================== */
 .navbar {
     height: 80px;
     padding: 0 6%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 24px;
 
     background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
 
     position: sticky;
     top: 0;
     z-index: 1000;
-
-    border-bottom: 1px solid var(--color-border);
 }
 
-.navbar_logo {
-    width: 210px;
-    height: 69px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
+.navbar_logo img {
+    height: 56px;
+    width: auto;
 }
 
 .navbar nav {
     display: flex;
-    gap: 35px;
+    gap: 32px;
 }
 
 .navbar nav a {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-dark);
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
 }
 
 .navbar nav a:hover {
-    color: var(--color-primary);
+    color: var(--color-primary-dark);
 }
 
-/*estilo botones*/
+
+/* ==================== BOTONES ==================== */
+.btn-reservar,
+.btn-secundario,
+.btn-login {
+    display: inline-block;
+    border-radius: var(--border-radius);
+    font-size: 13px;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
 
 .btn-reservar {
-    display: inline-block;
-    padding: 15px 32px;
-
-    border-radius: var(--border-radius);
-
+    padding: 14px 30px;
+    border: 1px solid var(--color-primary);
     background-color: var(--color-primary);
     color: var(--color-white);
-    font-size: 13px;
-
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .btn-reservar:hover {
     background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
 
-    transform: translateY(-2px);
+.btn-secundario {
+    padding: 14px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    color: var(--color-white);
+}
+
+.btn-secundario:hover {
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 .btn-login {
     padding: 10px 20px;
-
     border: 1px solid var(--color-dark);
-    border-radius: var(--border-radius);
-
-    font-size: 13px;
-
-    transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .btn-login:hover {
@@ -126,215 +158,305 @@ img {
     color: var(--color-white);
 }
 
-.forma-buscador button {
-    height: 45px;
-    padding: 0 30px;
-    border: none;
-    border-radius: var(--border-radius);
 
-    background-color: var(--color-dark);
-    color: var(--color-white);
-
-    cursor: pointer;
-    font-size: 13px;
-    letter-spacing: 1px;
-
-    transition: background-color 0.3s ease;
-}
-
-.forma-buscador button:hover {
-    background-color: var(--color-primary-dark);
-}
-
-/* seccion hero */
-
+/* ==================== HERO ==================== */
 .hero {
-    height: 100vh;
+    min-height: calc(100vh - 80px);
+    padding: 120px 6% 140px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    position: relative;
 
-    background-image: url("hero.png"); /*agregamos la imagen de fondo*/
+    /* Oscurece la foto a la izquierda para que el texto blanco se lea */
+    background-color: var(--color-dark);
+    background-image:
+        linear-gradient(90deg, rgba(20, 18, 15, 0.78) 0%, rgba(20, 18, 15, 0.35) 55%, rgba(20, 18, 15, 0.1) 100%),
+        url("../img/hero-torre-del-reloj.jpg");
     background-size: cover;
     background-position: center;
 }
 
-.hero h1 {
-    font-family: var(--font-title);
-
-    font-size: clamp(45px, 6vw, 80px);
-
-    font-weight: 400;
-
-    line-height: 1.05;
-
-    margin-bottom: 25px;
-}
-
 .hero-content {
-    text-align: center;
+    max-width: 560px;
     color: var(--color-white);
 }
 
-.subtitle {
-    font-size: 14px;
-    letter-spacing: 5px;
-    margin-bottom: 20px;
+.hero .subtitulo {
+    color: var(--color-primary);
 }
 
-/* Sección de búsqueda */
+.hero h1 {
+    font-family: var(--font-title);
+    font-size: clamp(42px, 6vw, 76px);
+    font-weight: 400;
+    line-height: 1.05;
+    margin-bottom: 22px;
+}
 
+.hero-texto {
+    font-size: 17px;
+    max-width: 440px;
+    margin-bottom: 34px;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.hero-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.hero-credito {
+    position: absolute;
+    right: 6%;
+    bottom: 80px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* ==================== BUSCADOR ==================== */
 .buscador {
     width: 90%;
-    max-width: 1050px;
-
-    margin: -55px auto 0;
-
-    padding: 35px 40px;
+    max-width: var(--ancho);
+    margin: -60px auto 0;
+    padding: 34px 40px;
 
     position: relative;
     z-index: 10;
 
     background-color: var(--color-white);
-
+    border-radius: var(--border-radius);
     box-shadow: var(--shadow);
 }
 
 .buscador h2 {
-    font-family: var(--font-title);
-
-    font-size: 30px;
-
-    font-weight: 400;
-
-    color: var(--color-dark);
-
-    margin-bottom: 25px;
+    margin-bottom: 24px;
 }
 
-/*formulario de búsqueda*/
 
+/* ==================== FORMULARIOS ==================== */
 .forma-buscador {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    gap: 18px;
     align-items: end;
 }
 
 .forma-buscador div {
     display: flex;
     flex-direction: column;
-
-    gap: 7px;
+    gap: 6px;
 }
 
 .forma-buscador label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .forma-buscador input,
 .forma-buscador select {
     width: 100%;
-    padding: 10px;
+    height: 46px;
+    padding: 0 12px;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
+    background-color: var(--color-white);
+    font: inherit;
+    font-size: 15px;
+    color: var(--color-dark);
 }
 
 .forma-buscador input:focus,
 .forma-buscador select:focus {
+    outline: none;
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(184, 155, 103, 0.25);
 }
-/* Footer final*/
-footer {
-    padding: 60px 6%;
+
+.forma-buscador button {
+    height: 46px;
+    padding: 0 30px;
+    border: none;
+    border-radius: var(--border-radius);
 
     background-color: var(--color-dark);
-
     color: var(--color-white);
-
-    text-align: center;
-}
-
-footer .logo {
-    color: var(--color-white);
-
-    margin-bottom: 15px;
-}
-
-footer p {
+    font: inherit;
     font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
 
-    color: var(--color-text);
-
-    margin-top: 5px;
+    transition: background-color 0.2s ease;
 }
 
-.integrantes {
-    display: flex;
-
-    justify-content: center;
-
-    gap: 15px;
-
-    margin-top: 10px;
-}
-
-/* ==================== MENSAJES DE LOS SERVICIOS ==================== */
-[hidden] {
-    display: none !important;
+.forma-buscador button:hover {
+    background-color: var(--color-primary-dark);
 }
 
 .mensaje {
-    margin-top: 20px;
+    margin-top: 18px;
     font-size: 15px;
 }
 
+.mensaje:empty {
+    display: none;
+}
+
 .mensaje.ok {
-    color: #2f6b3a;
+    color: var(--color-ok);
 }
 
 .mensaje.error {
-    color: #a23b2a;
+    color: var(--color-error);
+}
+
+.aviso {
+    margin-bottom: 22px;
+    padding: 14px 18px;
+    border-left: 3px solid #b7791f;
+    border-radius: var(--border-radius);
+    background-color: #fbf3e4;
+    color: var(--color-dark);
+    font-size: 14px;
+}
+
+.aviso p + p {
+    margin-top: 6px;
 }
 
 #btn-confirmar {
-    margin-top: 15px;
-    border: none;
-    cursor: pointer;
+    margin-top: 14px;
+    font: inherit;
+    font-size: 13px;
 }
 
-/* ==================== SECCIONES (habitaciones, reservas, registro) ==================== */
+
+/* ==================== SECCIONES ==================== */
 .seccion {
     width: 90%;
-    max-width: 1050px;
-    margin: 70px auto;
+    max-width: var(--ancho);
+    margin: 96px auto;
 }
 
-.seccion h2 {
-    font-family: var(--font-title);
-    font-size: 30px;
-    font-weight: 400;
-    color: var(--color-dark);
-    margin-bottom: 25px;
+.seccion-encabezado {
+    max-width: 620px;
+    margin-bottom: 36px;
 }
+
+.seccion-encabezado p:last-child:not(.subtitulo) {
+    margin-top: 12px;
+    color: var(--color-text);
+}
+
+
+/* ==================== DESCUBRE POPAYÁN (galería) ==================== */
+.galeria {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 230px;
+    gap: 12px;
+    grid-template-areas:
+        "caldas  caldas  puente puente"
+        "caldas  caldas  morro  calle"
+        "domingo domingo santa  calle";
+}
+
+.item-caldas  { grid-area: caldas; }
+.item-puente  { grid-area: puente; }
+.item-morro   { grid-area: morro; }
+.item-calle   { grid-area: calle; }
+.item-domingo { grid-area: domingo; }
+.item-santa   { grid-area: santa; }
+
+.galeria-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background-color: var(--color-light);
+}
+
+.galeria-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.item-domingo img {
+    object-position: center 25%;
+}
+
+.galeria-item:hover img {
+    transform: scale(1.04);
+}
+
+/* Sombra en la parte baja de la foto para que el texto se lea */
+.galeria-item figcaption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 40px 16px 14px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.galeria-item figcaption strong {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--color-white);
+    margin-bottom: 2px;
+}
+
 
 /* ==================== TARJETAS DE HABITACIONES ==================== */
 .tarjetas {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
 }
 
 .tarjeta {
-    padding: 25px;
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
+    overflow: hidden;
     background-color: var(--color-white);
-    box-shadow: var(--shadow);
     color: var(--color-text);
     font-size: 14px;
+}
+
+.tarjeta-foto {
+    position: relative;
+    background-color: var(--color-light);
+}
+
+/* Estado de la habitación sobre la esquina de la foto */
+.tarjeta-foto .estado {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: rgba(255, 255, 255, 0.92);
+}
+
+/* Todas las fotos con la misma proporción, sin importar el tamaño original */
+.tarjeta-foto img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+}
+
+.tarjeta-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px;
+    flex: 1;
 }
 
 .tarjeta h3 {
@@ -342,22 +464,61 @@ footer p {
     font-size: 22px;
     font-weight: 400;
     color: var(--color-dark);
-    margin-bottom: 8px;
 }
 
 .tarjeta-tipo {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--color-primary);
+    color: var(--color-primary-dark);
+}
+
+.tarjeta-pie {
+    margin-top: auto;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-tarjeta {
+    width: 100%;
+    padding: 11px 16px;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--border-radius);
+    background-color: var(--color-white);
+    color: var(--color-primary-dark);
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-tarjeta:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-tarjeta:disabled {
+    border-color: var(--color-border);
+    color: #999999;
+    cursor: not-allowed;
 }
 
 .tarjeta-precio {
-    margin: 12px 0;
+    white-space: nowrap;
     font-size: 17px;
-    font-weight: bold;
+    font-weight: 600;
     color: var(--color-dark);
 }
+
+.tarjeta-precio span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text);
+}
+
 
 /* ==================== ETIQUETAS DE ESTADO ==================== */
 .estado {
@@ -378,12 +539,15 @@ footer p {
 .estado.ocupada,
 .estado.mantenimiento {
     background-color: #eeeeee;
-    color: #888888;
+    color: #777777;
 }
+
 
 /* ==================== TABLA DE RESERVAS ==================== */
 .tabla-contenedor {
     overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
 }
 
 .tabla-reservas {
@@ -394,38 +558,177 @@ footer p {
 
 .tabla-reservas th,
 .tabla-reservas td {
-    padding: 12px;
+    padding: 14px 16px;
     text-align: left;
     border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+
+.tabla-reservas tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .tabla-reservas th {
     background-color: var(--color-light);
-    color: var(--color-dark);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text);
 }
 
 .btn-eliminar {
     padding: 6px 14px;
-    border: 1px solid #a23b2a;
+    border: 1px solid var(--color-error);
     border-radius: var(--border-radius);
     background: none;
-    color: #a23b2a;
-    cursor: pointer;
+    color: var(--color-error);
+    font: inherit;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .btn-eliminar:hover {
-    background-color: #a23b2a;
+    background-color: var(--color-error);
     color: var(--color-white);
 }
 
-/* ==================== CELULARES ==================== */
-@media (max-width: 768px) {
+
+/* ==================== REGISTRO ==================== */
+.registro {
+    padding: 48px 40px;
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+}
+
+
+/* ==================== FOOTER ==================== */
+footer {
+    padding: 64px 6% 32px;
+    background-color: var(--color-dark);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 14px;
+}
+
+.footer-principal {
+    max-width: var(--ancho);
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.footer-logo {
+    font-family: var(--font-title);
+    font-size: 26px;
+    color: var(--color-white);
+    margin-bottom: 6px;
+}
+
+.footer-titulo {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+}
+
+.integrantes {
+    list-style: none;
+}
+
+.creditos {
+    max-width: var(--ancho);
+    margin: 40px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+}
+
+.creditos summary {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.creditos ul {
+    margin: 12px 0 8px 18px;
+    line-height: 1.8;
+}
+
+.creditos a {
+    text-decoration: underline;
+}
+
+.creditos a:hover {
+    color: var(--color-white);
+}
+
+.footer-legal {
+    max-width: var(--ancho);
+    margin: 24px auto 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+
+/* ==================== CELULARES Y TABLETAS ==================== */
+@media (max-width: 900px) {
+    .navbar nav {
+        display: none;
+    }
+
+    .galeria {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 200px;
+        grid-template-areas:
+            "caldas  caldas"
+            "puente  puente"
+            "morro   calle"
+            "santa   calle"
+            "domingo domingo";
+    }
+}
+
+@media (max-width: 640px) {
+    .navbar {
+        padding: 0 16px;
+    }
+
+    .navbar_logo img {
+        height: 44px;
+    }
+
+    .hero {
+        padding: 72px 16px 120px;
+    }
+
+    .hero-credito {
+        right: 16px;
+        bottom: 76px;
+    }
+
+    .buscador,
+    .registro {
+        padding: 28px 20px;
+    }
+
     .forma-buscador {
         grid-template-columns: 1fr;
     }
 
-    .navbar nav {
-        display: none;
+    .seccion {
+        margin: 72px auto;
+    }
+
+    .galeria {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 240px;
+        grid-template-areas:
+            "caldas"
+            "puente"
+            "morro"
+            "calle"
+            "domingo"
+            "santa";
     }
 }

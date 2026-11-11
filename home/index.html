@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOTEL ALMA BLANCA</title>
+    <title>Hotel Alma Blanca · Popayán</title>
+    <meta name="description" content="Hotel Alma Blanca en el centro histórico de Popayán, la Ciudad Blanca de Colombia. Consulta disponibilidad y reserva en línea.">
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,12 +12,13 @@
     <!-- ==================== NAVEGACIÓN ==================== -->
     <header class="navbar">
 
-        <div class="navbar_logo">
-            <img src="css/logo.png" alt="Alma Blanca">
-        </div>
+        <a href="#" class="navbar_logo">
+            <img src="css/logo.png" alt="Hotel Alma Blanca">
+        </a>
 
         <nav class="navbar_menu">
             <a href="#" class="navbar_link">Inicio</a>
+            <a href="#popayan" class="navbar_link">Popayán</a>
             <a href="#habitaciones" class="navbar_link">Habitaciones</a>
             <a href="#reservas" class="navbar_link">Reservas</a>
             <a href="#registro" class="navbar_link">Registro</a>
@@ -35,24 +37,29 @@
             <div class="hero-content">
 
                 <p class="subtitulo">
-                    HOTEL ALMA BLANCA
+                    Hotel Alma Blanca · Popayán
                 </p>
 
                 <h1>
-                    Tu descanso<br>
-                    comienza aquí
+                    Tu descanso en<br>
+                    la Ciudad Blanca
                 </h1>
 
-                <p>
-                    Encuentra el espacio perfecto para disfrutar
-                    una experiencia de descanso y tranquilidad.
+                <p class="hero-texto">
+                    A pocas cuadras del Parque Caldas y la Torre del Reloj,
+                    en el corazón del centro histórico de Popayán.
                 </p>
 
-                <a href="#buscador" class="btn-reservar">
-                    Reservar ahora
-                </a>
+                <div class="hero-botones">
+                    <a href="#buscador" class="btn-reservar">Reservar ahora</a>
+                    <a href="#popayan" class="btn-secundario">Descubre Popayán</a>
+                </div>
 
             </div>
+
+            <p class="hero-credito">
+                Torre del Reloj y Catedral de Popayán
+            </p>
 
         </section>
 
@@ -62,6 +69,8 @@
             <h2>
                 Encuentra tu habitación
             </h2>
+
+            <div id="aviso-circuitos" class="aviso" role="status" hidden></div>
 
             <form class="forma-buscador" id="form-buscar">
 
@@ -113,12 +122,77 @@
 
         </section>
 
+        <!-- ==================== DESCUBRE POPAYÁN ==================== -->
+        <section class="seccion" id="popayan">
+
+            <div class="seccion-encabezado">
+                <h2>Descubre Popayán</h2>
+                <p>
+                    Fundada en 1537, Popayán conserva uno de los centros históricos coloniales
+                    mejor cuidados de Colombia. Sus fachadas encaladas le dan el nombre de Ciudad Blanca.
+                </p>
+            </div>
+
+            <div class="galeria">
+
+                <figure class="galeria-item item-caldas">
+                    <img src="img/popayan-parque-caldas.jpg" alt="Parque Caldas al atardecer, con faroles encendidos y casas blancas alrededor" loading="lazy">
+                    <figcaption>
+                        <strong>Parque Caldas</strong>
+                        La plaza principal, rodeada por la Catedral y la Torre del Reloj.
+                    </figcaption>
+                </figure>
+
+                <figure class="galeria-item item-puente">
+                    <img src="img/popayan-puente-humilladero.jpg" alt="Puente del Humilladero, con sus arcos de ladrillo" loading="lazy">
+                    <figcaption>
+                        <strong>Puente del Humilladero</strong>
+                        Puente de arcos de ladrillo del siglo XIX que une el centro con el norte.
+                    </figcaption>
+                </figure>
+
+                <figure class="galeria-item item-morro">
+                    <img src="img/popayan-morro-tulcan.jpg" alt="El Morro de Tulcán, una colina verde sobre los tejados de la ciudad" loading="lazy">
+                    <figcaption>
+                        <strong>Morro de Tulcán</strong>
+                        Colina precolombina con vista a toda la ciudad.
+                    </figcaption>
+                </figure>
+
+                <figure class="galeria-item item-calle">
+                    <img src="img/popayan-calle-centro.jpg" alt="Calle del centro histórico con casas coloniales blancas" loading="lazy">
+                    <figcaption>
+                        <strong>Calles del centro</strong>
+                        Casas coloniales encaladas y balcones de madera.
+                    </figcaption>
+                </figure>
+
+                <figure class="galeria-item item-domingo">
+                    <img src="img/popayan-santo-domingo.jpg" alt="Iglesia de Santo Domingo iluminada de noche" loading="lazy">
+                    <figcaption>
+                        <strong>Iglesia de Santo Domingo</strong>
+                        Templo colonial del centro histórico.
+                    </figcaption>
+                </figure>
+
+                <figure class="galeria-item item-santa">
+                    <img src="img/popayan-semana-santa.jpg" alt="Paso de una procesión de Semana Santa en Popayán, de noche" loading="lazy">
+                    <figcaption>
+                        <strong>Semana Santa</strong>
+                        Procesiones declaradas patrimonio de la humanidad por la UNESCO en 2009.
+                    </figcaption>
+                </figure>
+
+            </div>
+
+        </section>
+
         <!-- ==================== HABITACIONES (servicio Habitaciones) ==================== -->
         <section class="seccion" id="habitaciones">
 
-            <h2>
-                Nuestras habitaciones
-            </h2>
+            <div class="seccion-encabezado">
+                <h2>Nuestras habitaciones</h2>
+            </div>
 
             <div class="tarjetas" id="lista-habitaciones"></div>
 
@@ -127,9 +201,9 @@
         <!-- ==================== RESERVAS (servicio Reservas) ==================== -->
         <section class="seccion" id="reservas">
 
-            <h2>
-                Reservas registradas
-            </h2>
+            <div class="seccion-encabezado">
+                <h2>Reservas registradas</h2>
+            </div>
 
             <p id="mensaje-reservas" class="mensaje"></p>
 
@@ -154,37 +228,38 @@
         </section>
 
         <!-- ==================== REGISTRO (servicio Usuarios) ==================== -->
-        <section class="seccion" id="registro">
+        <section class="seccion registro" id="registro">
 
-            <h2>
-                Regístrate como huésped
-            </h2>
+            <div class="seccion-encabezado">
+                <h2>Regístrate como huésped</h2>
+                <p>Con tu registro puedes elegirte como titular al hacer una reserva.</p>
+            </div>
 
             <form class="forma-buscador" id="form-registro">
 
                 <div>
                     <label for="nombre">Nombre</label>
-                    <input type="text" id="nombre" required>
+                    <input type="text" id="nombre" autocomplete="given-name" required>
                 </div>
 
                 <div>
                     <label for="apellido">Apellido</label>
-                    <input type="text" id="apellido" required>
+                    <input type="text" id="apellido" autocomplete="family-name" required>
                 </div>
 
                 <div>
                     <label for="documento">Documento</label>
-                    <input type="text" id="documento" required>
+                    <input type="text" id="documento" inputmode="numeric" required>
                 </div>
 
                 <div>
                     <label for="email">Correo</label>
-                    <input type="email" id="email" required>
+                    <input type="email" id="email" autocomplete="email" required>
                 </div>
 
                 <div>
                     <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" required>
+                    <input type="tel" id="telefono" autocomplete="tel" required>
                 </div>
 
                 <button type="submit">
@@ -201,23 +276,43 @@
     <!-- ==================== FOOTER ==================== -->
     <footer id="contacto">
 
-        <div class="logo">
-            ALMA BLANCA
+        <div class="footer-principal">
+            <div>
+                <p class="footer-logo">Alma Blanca</p>
+                <p>Hotel en el centro histórico de Popayán, Cauca, Colombia.</p>
+            </div>
+
+            <div>
+                <p class="footer-titulo">Equipo</p>
+                <ul class="integrantes">
+                    <li>Danilo Collazos Alegría</li>
+                    <li>Maira García Rivera</li>
+                    <li>Andrés Casanova Rengifo</li>
+                    <li>Yisel Verónica Pajoy Maca</li>
+                </ul>
+            </div>
         </div>
 
-        <p>
-            Hotel Alma Blanca
-        </p>
+        <!-- Créditos obligatorios de las fotos (licencias Creative Commons de Wikimedia Commons) -->
+        <details class="creditos">
+            <summary>Créditos de las fotos</summary>
+            <ul>
+                <li>Torre del Reloj y Catedral: <a href="https://commons.wikimedia.org/wiki/File:Torre-del-Reloj_Popayan.jpg">Carlos Felipe López Cerón</a>, CC BY 4.0</li>
+                <li>Parque Caldas: <a href="https://commons.wikimedia.org/wiki/File:Whitecity.jpg">Car710</a>, CC BY-SA 3.0</li>
+                <li>Puente del Humilladero: <a href="https://commons.wikimedia.org/wiki/File:Puente_del_Humilladero,_Popay%C3%A1n_03.jpg">Bernard Gagnon</a>, CC BY-SA 4.0</li>
+                <li>Morro de Tulcán: <a href="https://commons.wikimedia.org/wiki/File:El_Morro_de_Tulc%C3%A1n,_Popay%C3%A1n.jpg">Bernard Gagnon</a>, CC BY-SA 4.0</li>
+                <li>Calles del centro: <a href="https://commons.wikimedia.org/wiki/File:Calle_soleada_del_centro_hist%C3%B3rico_de_Popay%C3%A1n.jpg">Uhernandez</a>, CC BY 3.0</li>
+                <li>Iglesia de Santo Domingo: <a href="https://commons.wikimedia.org/wiki/File:Iglesia_Santo-Domingo_Popayan.jpg">Carlos Felipe López Cerón</a>, CC BY 4.0</li>
+                <li>Semana Santa: <a href="https://commons.wikimedia.org/wiki/File:El_cachorro_popayan_2009.jpg">Paulocamo</a>, dominio público</li>
+                <li>Habitación sencilla: <a href="https://commons.wikimedia.org/wiki/File:Ibis_Hotels_Dresden_Single_Room_Standard_Queen_Size_Bed.png">Ibis Hotels Dresden</a>, CC BY-SA 4.0</li>
+                <li>Habitación doble: <a href="https://commons.wikimedia.org/wiki/File:Bed_in_hotel_room_2.jpg">Kurt Kaiser</a>, CC0</li>
+                <li>Suite: <a href="https://commons.wikimedia.org/wiki/File:Canopy_bed_of_Amantaka_Suite_in_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg">Basile Morin</a>, CC BY-SA 4.0</li>
+            </ul>
+            <p>Fotos tomadas de Wikimedia Commons y redimensionadas para la web.</p>
+        </details>
 
-        <div class="integrantes">
-            <p>DANILO COLLAZOS ALEGRÍA</p>
-            <p>MAIRA GARCÍA RIVERA</p>
-            <p>ANDRÉS CASANOVA RENGIFO</p>
-            <p>YISEL VERÓNICA PAJOY MACA</p>
-        </div>
-
-        <p>
-            © 2026 Todos los derechos reservados.
+        <p class="footer-legal">
+            © 2026 Hotel Alma Blanca · Proyecto académico de Sistemas Distribuidos
         </p>
 
     </footer>
