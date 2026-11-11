@@ -3,7 +3,6 @@ import os
 
 from flask import Flask, jsonify, request
 from psycopg.rows import dict_row
-from werkzeug.exceptions import HTTPException
 from habitaciones_db import conectar, crear_tabla
 
 app = Flask(__name__)
