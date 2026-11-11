@@ -1,7 +1,8 @@
 import os
+import time
 import requests
+import pybreaker
 from flask import Flask, jsonify, request
-from werkzeug.exceptions import HTTPException
 import psycopg
 from usuarios_db import conectar, crear_tabla
 
@@ -15,12 +16,21 @@ def permitir_cors(respuesta):
     respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
     return respuesta
 
-@app.errorhandler(Exception)
-def error_interno(error):
-    if isinstance(error, HTTPException):
-        return error
-    app.logger.exception("Error inesperado")
-    return jsonify({"mensaje": f"Error interno del servicio: {error}"}), 500
+circuito_reservas = pybreaker.CircuitBreaker(
+    fail_max=int(os.getenv("CB_MAX_FALLOS", "3")),
+    reset_timeout=int(os.getenv("CB_RECUPERACION", "30")),
+    throw_new_error_on_trip=False,
+)
+
+@app.route("/usuarios/circuito")
+def estado_circuito():
+    return jsonify({
+        "estado": circuito_reservas.current_state.upper(),
+        "fallos_consecutivos": circuito_reservas.fail_counter,
+        "umbral_fallos": circuito_reservas.fail_max,
+        "periodo_recuperacion_s": circuito_reservas.reset_timeout,
+    }), 200
+
 
 @app.route("/usuarios", methods=["GET"])
 def listarUsuarios():
@@ -215,13 +225,34 @@ def consultarReservasUsuario(id):
     conexion.close()
     if usuario is None:
         return jsonify({"mensaje": "Usuario no encontrado"}), 404
+
     reservasUrl = os.getenv("RESERVAS_URL", "http://localhost:5002")
-    respuesta = requests.get(
-        f"{reservasUrl.rstrip('/')}/reservas",
-        params={"usuario_id": id},
-        timeout=5
-    )
-    reservas = respuesta.json()
+    try:
+        with circuito_reservas.calling():
+            respuesta = requests.get(
+                f"{reservasUrl.rstrip('/')}/reservas",
+                params={"usuario_id": id},
+                timeout=float(os.getenv("RESERVAS_TIMEOUT", "2")),
+            )
+            if respuesta.status_code >= 500:
+                respuesta.raise_for_status()
+            reservas = respuesta.json() if respuesta.status_code == 200 else None
+    except pybreaker.CircuitBreakerError:
+        return jsonify({"mensaje": "Circuito abierto: Reservas no será consultado"}), 503
+    except requests.exceptions.Timeout:
+        return jsonify({"mensaje": "El servicio de reservas tardó demasiado en responder"}), 504
+    except requests.exceptions.ConnectionError:
+        return jsonify({"mensaje": "El servicio de reservas no está disponible"}), 503
+    except requests.exceptions.HTTPError:
+        return jsonify({"mensaje": "Error del servidor de reservas"}), 502
+    except requests.exceptions.RequestException:
+        return jsonify({"mensaje": "Error al consultar el servicio de reservas"}), 502
+    except ValueError:
+        return jsonify({"mensaje": "Respuesta inválida del servicio de reservas"}), 502
+
+    if respuesta.status_code != 200:
+        return jsonify({"mensaje": "Respuesta inesperada del servicio de reservas"}), 502
+
     return jsonify({
         "usuario": usuario,
         "reservas": reservas
