@@ -1,8 +1,21 @@
+import os
+import time
+
 from flask import Flask, jsonify, request
 from psycopg.rows import dict_row
-from habitaciones_db import conectar
+from habitaciones_db import conectar, crear_tabla
 
 app = Flask(__name__)
+
+
+@app.after_request
+def permitir_cors(respuesta):
+    respuesta.headers["Access-Control-Allow-Origin"] = "*"
+    respuesta.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    respuesta.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE"
+    return respuesta
+
+
 app.json.ensure_ascii = False
 
 @app.route("/health")
@@ -26,6 +39,7 @@ def listar():
 
 @app.route("/habitaciones/<int:id>")
 def buscar(id):
+    time.sleep(float(os.getenv("HABITACIONES_DELAY", "0")))
     conexion = conectar()
     cursor = conexion.cursor(row_factory=dict_row)
     sql = """
@@ -121,4 +135,5 @@ def eliminar(id):
 
     return jsonify({"mensaje": "Habitación eliminada correctamente"})
 
+crear_tabla()
 app.run(host="0.0.0.0", port=5000, debug=True)
