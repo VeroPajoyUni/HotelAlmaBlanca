@@ -6,6 +6,12 @@ const API_USUARIOS = "http://localhost:5001";
 const API_RESERVAS = "http://localhost:5002";
 const API_HABITACIONES = "http://localhost:5003";
 
+const FOTOS_HABITACION = {
+    sencilla: "img/habitacion-sencilla.jpg",
+    doble: "img/habitacion-doble.jpg",
+    suite: "img/habitacion-suite.jpg",
+};
+
 
 /* ==========================================================
    2. ELEMENTOS DEL HTML Y DATOS EN MEMORIA
@@ -20,6 +26,7 @@ const listaReservas = document.getElementById("lista-reservas");
 const mensajeReservas = document.getElementById("mensaje-reservas");
 const formRegistro = document.getElementById("form-registro");
 const mensajeRegistro = document.getElementById("mensaje-registro");
+const avisoCircuitos = document.getElementById("aviso-circuitos");
 
 let habitaciones = [];
 let usuarios = [];
@@ -78,14 +85,27 @@ async function cargarHabitaciones() {
                     ${habitacion.numero} - ${habitacion.tipo} (${habitacion.capacidad} pers.)
                 </option>`;
 
+            // Un tipo nuevo que no esté en FOTOS_HABITACION usa la foto de la doble
+            const foto = FOTOS_HABITACION[habitacion.tipo] || FOTOS_HABITACION.doble;
+            const enMantenimiento = habitacion.estado === "mantenimiento";
             listaHabitaciones.innerHTML += `
                 <article class="tarjeta">
-                    <p class="tarjeta-tipo">${habitacion.tipo}</p>
-                    <h3>Habitación ${habitacion.numero}</h3>
-                    <p>${habitacion.descripcion || ""}</p>
-                    <p>Capacidad: ${habitacion.capacidad} persona(s)</p>
-                    <p class="tarjeta-precio">${formatearPrecio(habitacion.precio_noche)} / noche</p>
-                    <span class="estado ${habitacion.estado}">${habitacion.estado}</span>
+                    <div class="tarjeta-foto">
+                        <img src="${foto}" alt="Habitación ${habitacion.tipo}" loading="lazy">
+                        <span class="estado ${habitacion.estado}">${habitacion.estado}</span>
+                    </div>
+                    <div class="tarjeta-cuerpo">
+                        <p class="tarjeta-tipo">${habitacion.tipo}</p>
+                        <h3>Habitación ${habitacion.numero}</h3>
+                        <p>${habitacion.descripcion || ""}</p>
+                        <p>Capacidad: ${habitacion.capacidad} persona(s)</p>
+                        <div class="tarjeta-pie">
+                            <p class="tarjeta-precio">${formatearPrecio(habitacion.precio_noche)} <span>/ noche</span></p>
+                            <button class="btn-tarjeta" onclick="elegirHabitacion(${habitacion.id})" ${enMantenimiento ? "disabled" : ""}>
+                                ${enMantenimiento ? "No disponible" : "Reservar"}
+                            </button>
+                        </div>
+                    </div>
                 </article>`;
         });
     } catch (error) {
@@ -135,18 +155,18 @@ formRegistro.addEventListener("submit", async function (evento) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(nuevoUsuario),
         });
-        const resultado = await respuesta.json();
+        const usuarioCreado = await respuesta.json();
 
         if (respuesta.status === 201) {
-            mostrarMensaje(mensajeRegistro, `¡Bienvenido(a), ${nuevoUsuario.nombre}! Ya puedes hacer tu reserva.`, "ok");
+            mostrarMensaje(mensajeRegistro, `Registro completo. ${nuevoUsuario.nombre} ya aparece como huésped titular en el buscador.`, "ok");
             formRegistro.reset();
             await cargarUsuarios();
-            selectUsuario.value = resultado.id;
+            selectUsuario.value = usuarioCreado.id;
         } else {
-            mostrarMensaje(mensajeRegistro, resultado.mensaje, "error");
+            mostrarMensaje(mensajeRegistro, usuarioCreado.mensaje, "error");
         }
     } catch (error) {
-        mostrarMensaje(mensajeRegistro, "No se pudo registrar. Revisa que el servicio esté encendido y que el documento o el correo no estén ya registrados.", "error");
+        mostrarMensaje(mensajeRegistro, textoError(error, "Usuarios"), "error");
     }
 });
 
@@ -158,25 +178,25 @@ formBuscar.addEventListener("submit", async function (evento) {
     evento.preventDefault();
     btnConfirmar.hidden = true;
 
-    const datos = {
+    const consulta = {
         usuario_id: Number(selectUsuario.value),
         habitacion_id: Number(selectHabitacion.value),
         fecha_entrada: document.getElementById("entrada").value,
         fecha_salida: document.getElementById("salida").value,
         huespedes: Number(document.getElementById("huespedes").value),
     };
-    const habitacion = buscarPorId(habitaciones, datos.habitacion_id);
+    const habitacion = buscarPorId(habitaciones, consulta.habitacion_id);
 
-    // Validaciones en el navegador antes de llamar al servicio
-    if (!habitacion || !datos.usuario_id) {
+    // Lo que el navegador ya sabe se valida aquí, sin gastar una petición al servicio
+    if (!habitacion || !consulta.usuario_id) {
         mostrarMensaje(mensajeBuscar, "Faltan habitaciones o huéspedes. Revisa que los servicios estén encendidos.", "error");
         return;
     }
-    if (datos.fecha_salida <= datos.fecha_entrada) {
+    if (consulta.fecha_salida <= consulta.fecha_entrada) {
         mostrarMensaje(mensajeBuscar, "La fecha de salida debe ser posterior a la de entrada.", "error");
         return;
     }
-    if (datos.huespedes > habitacion.capacidad) {
+    if (consulta.huespedes > habitacion.capacidad) {
         mostrarMensaje(mensajeBuscar, `La habitación ${habitacion.numero} es para máximo ${habitacion.capacidad} persona(s).`, "error");
         return;
     }
@@ -186,22 +206,22 @@ formBuscar.addEventListener("submit", async function (evento) {
     }
 
     try {
-        const url = `${API_RESERVAS}/reservas/disponibilidad?habitacion_id=${datos.habitacion_id}`
-            + `&fecha_entrada=${datos.fecha_entrada}&fecha_salida=${datos.fecha_salida}`;
+        const url = `${API_RESERVAS}/reservas/disponibilidad?habitacion_id=${consulta.habitacion_id}`
+            + `&fecha_entrada=${consulta.fecha_entrada}&fecha_salida=${consulta.fecha_salida}`;
         const respuesta = await fetch(url);
-        const resultado = await respuesta.json();
+        const disponibilidad = await respuesta.json();
 
-        if (resultado.disponible) {
-            const noches = calcularNoches(datos.fecha_entrada, datos.fecha_salida);
+        if (disponibilidad.disponible) {
+            const noches = calcularNoches(consulta.fecha_entrada, consulta.fecha_salida);
             const total = noches * habitacion.precio_noche;
-            mostrarMensaje(mensajeBuscar, `¡Habitación ${habitacion.numero} disponible! ${noches} noche(s) por un total de ${formatearPrecio(total)}.`, "ok");
-            reservaPendiente = datos;
+            mostrarMensaje(mensajeBuscar, `Habitación ${habitacion.numero} disponible: ${noches} noche(s), total ${formatearPrecio(total)}.`, "ok");
+            reservaPendiente = consulta;
             btnConfirmar.hidden = false;
         } else {
             mostrarMensaje(mensajeBuscar, `La habitación ${habitacion.numero} ya está reservada en esas fechas.`, "error");
         }
     } catch (error) {
-        mostrarMensaje(mensajeBuscar, "No se pudo conectar con el servicio de Reservas.", "error");
+        mostrarMensaje(mensajeBuscar, textoError(error, "Reservas"), "error");
     }
 });
 
@@ -220,18 +240,19 @@ btnConfirmar.addEventListener("click", async function () {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(reservaPendiente),
         });
-        const resultado = await respuesta.json();
+        const reservaCreada = await respuesta.json();
 
         if (respuesta.status === 201) {
-            mostrarMensaje(mensajeBuscar, `Reserva N.º ${resultado.id} creada correctamente.`, "ok");
+            mostrarMensaje(mensajeBuscar, `Reserva N.º ${reservaCreada.id} creada.`, "ok");
             btnConfirmar.hidden = true;
             cargarReservas();
         } else {
-            mostrarMensaje(mensajeBuscar, resultado.mensaje, "error");
+            mostrarMensaje(mensajeBuscar, reservaCreada.mensaje, "error");
         }
     } catch (error) {
-        mostrarMensaje(mensajeBuscar, "No se pudo conectar con el servicio de Reservas.", "error");
+        mostrarMensaje(mensajeBuscar, textoError(error, "Reservas"), "error");
     }
+    revisarCircuitos();
 });
 
 
@@ -278,23 +299,73 @@ async function cargarReservas() {
 async function eliminarReserva(id) {
     try {
         const respuesta = await fetch(API_RESERVAS + "/reservas/" + id, { method: "DELETE" });
-        const resultado = await respuesta.json();
-        mostrarMensaje(mensajeReservas, resultado.mensaje, respuesta.ok ? "ok" : "error");
+        const confirmacion = await respuesta.json();
+        mostrarMensaje(mensajeReservas, confirmacion.mensaje, respuesta.ok ? "ok" : "error");
         cargarReservas();
     } catch (error) {
-        mostrarMensaje(mensajeReservas, "No se pudo conectar con el servicio de Reservas.", "error");
+        mostrarMensaje(mensajeReservas, textoError(error, "Reservas"), "error");
     }
 }
 
 
 /* ==========================================================
-   11. INICIO: cargar los datos al abrir la página
+   11. RESERVAR DESDE UNA TARJETA: llevar la habitación al buscador
+   ========================================================== */
+function elegirHabitacion(id) {
+    const habitacion = buscarPorId(habitaciones, id);
+    const selectHuespedes = document.getElementById("huespedes");
+
+    selectHabitacion.value = id;
+    if (Number(selectHuespedes.value) > habitacion.capacidad) {
+        selectHuespedes.value = habitacion.capacidad;
+    }
+    btnConfirmar.hidden = true;
+    mostrarMensaje(mensajeBuscar, `Elegiste la habitación ${habitacion.numero}. Indica las fechas y presiona Buscar.`, "ok");
+
+    document.getElementById("buscador").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("entrada").focus({ preventScroll: true });
+}
+
+
+/* ==========================================================
+   12. SERVICIO RESERVAS: estado de los circuit breaker (GET)
+   ========================================================== */
+async function revisarCircuitos() {
+    try {
+        const respuesta = await fetch(API_RESERVAS + "/reservas/circuito");
+        const circuitos = await respuesta.json();
+        if (!respuesta.ok) throw new Error(circuitos.mensaje);
+
+        const avisos = [];
+        Object.entries(circuitos).forEach(function ([servicio, circuito]) {
+            const nombre = servicio.charAt(0).toUpperCase() + servicio.slice(1);
+            if (circuito.estado === "OPEN") {
+                avisos.push(`El servicio de ${nombre} no está respondiendo. Las reservas no se pueden confirmar por ahora; se volverá a intentar en unos ${circuito.periodo_recuperacion_s} segundos.`);
+            } else if (circuito.estado === "HALF-OPEN") {
+                avisos.push(`El servicio de ${nombre} se está recuperando. La próxima reserva comprobará si ya responde.`);
+            }
+        });
+
+        avisoCircuitos.innerHTML = avisos.map(function (aviso) {
+            return `<p>${aviso}</p>`;
+        }).join("");
+        avisoCircuitos.hidden = avisos.length === 0;
+    } catch (error) {
+        // Si Reservas no responde, la tabla de reservas ya muestra ese error
+        avisoCircuitos.hidden = true;
+    }
+}
+
+
+/* ==========================================================
+   13. INICIO: cargar los datos al abrir la página
    (primero habitaciones y usuarios, porque la tabla de reservas los usa)
    ========================================================== */
 async function iniciar() {
     await cargarHabitaciones();
     await cargarUsuarios();
     await cargarReservas();
+    revisarCircuitos();
 }
 
 iniciar();
