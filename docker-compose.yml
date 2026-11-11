@@ -73,14 +73,25 @@ services:
       - reservas-db
       
   pagos-db:
-    image: postgres:alpine
-    command: sh -c "echo 'Base de datos de Pagos (pendiente)' && sleep infinity"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${PAGOS_DB_NAME}
+      POSTGRES_USER: ${PAGOS_DB_USER}
+      POSTGRES_PASSWORD: ${PAGOS_DB_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - pagos_data:/var/lib/postgresql/data
 
   pagos:
-    image: node:alpine
-    command: sh -c "echo 'Servicio Pagos (pendiente de implementar)' && sleep infinity"
+    build: ./servicios/pagos
+    ports:
+      - "5004:5000"
+    env_file:
+      - .env
     depends_on:
       - pagos-db
+      - reservas
       
   notificaciones-db:
     image: redis:alpine
@@ -96,4 +107,5 @@ volumes:
   reservas_data:
   usuarios_data:
   habitaciones_data:
+  pagos_data:
 
