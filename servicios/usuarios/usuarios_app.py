@@ -225,7 +225,34 @@ def consultarReservasUsuario(id):
     conexion.close()
     if usuario is None:
         return jsonify({"mensaje": "Usuario no encontrado"}), 404
+
     reservasUrl = os.getenv("RESERVAS_URL", "http://localhost:5002")
+    try:
+        with circuito_reservas.calling():
+            respuesta = requests.get(
+                f"{reservasUrl.rstrip('/')}/reservas",
+                params={"usuario_id": id},
+                timeout=float(os.getenv("RESERVAS_TIMEOUT", "2")),
+            )
+            if respuesta.status_code >= 500:
+                respuesta.raise_for_status()
+            reservas = respuesta.json() if respuesta.status_code == 200 else None
+    except pybreaker.CircuitBreakerError:
+        return jsonify({"mensaje": "Circuito abierto: Reservas no será consultado"}), 503
+    except requests.exceptions.Timeout:
+        return jsonify({"mensaje": "El servicio de reservas tardó demasiado en responder"}), 504
+    except requests.exceptions.ConnectionError:
+        return jsonify({"mensaje": "El servicio de reservas no está disponible"}), 503
+    except requests.exceptions.HTTPError:
+        return jsonify({"mensaje": "Error del servidor de reservas"}), 502
+    except requests.exceptions.RequestException:
+        return jsonify({"mensaje": "Error al consultar el servicio de reservas"}), 502
+    except ValueError:
+        return jsonify({"mensaje": "Respuesta inválida del servicio de reservas"}), 502
+
+    if respuesta.status_code != 200:
+        return jsonify({"mensaje": "Respuesta inesperada del servicio de reservas"}), 502
+
     return jsonify({
         "usuario": usuario,
         "reservas": reservas
