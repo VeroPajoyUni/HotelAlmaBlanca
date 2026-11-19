@@ -115,7 +115,7 @@ services:
   gateway:
     build: ./servicios/gateway
     ports:
-      - "5000:5000"
+      - "8080:5000"
     environment:
       USUARIOS_URL: ${USUARIOS_URL}
       HABITACIONES_URL: ${HABITACIONES_URL}
