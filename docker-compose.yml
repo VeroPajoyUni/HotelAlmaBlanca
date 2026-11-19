@@ -112,6 +112,20 @@ services:
       - .env
     depends_on:
       - notificaciones-db
+  gateway:
+    build: ./servicios/gateway
+    ports:
+      - "5000:5000"
+    environment:
+      USUARIOS_URL: ${USUARIOS_URL}
+      HABITACIONES_URL: ${HABITACIONES_URL}
+      RESERVAS_URL: ${RESERVAS_URL}
+      PAGOS_URL: ${PAGOS_URL}
+    depends_on:
+      - usuarios
+      - habitaciones
+      - reservas
+      - pagos
 
 volumes:
   reservas_data:
