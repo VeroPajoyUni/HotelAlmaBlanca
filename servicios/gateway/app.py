@@ -41,6 +41,48 @@ def ruta_usuarios():
 def ruta_usuarios_detalle(id):
     return reenviar(request.method, USUARIOS_URL + "/usuarios/" + str(id))
 
+@app.route("/habitaciones", methods=["GET", "POST"])
+def ruta_habitaciones():
+    return reenviar(request.method, HABITACIONES_URL + "/habitaciones")
 
+
+@app.route("/habitaciones/<int:id>", methods=["GET", "PUT", "DELETE"])
+def ruta_habitaciones_detalle(id):
+    return reenviar(request.method, HABITACIONES_URL + "/habitaciones/" + str(id))
+
+
+@app.route("/reservas", methods=["GET", "POST"])
+def ruta_reservas():
+    return reenviar(request.method, RESERVAS_URL + "/reservas")
+
+
+@app.route("/reservas/disponibilidad", methods=["GET"])
+def ruta_reservas_disponibilidad():
+    return reenviar(request.method, RESERVAS_URL + "/reservas/disponibilidad")
+
+
+@app.route("/reservas/<int:id>", methods=["GET", "PUT", "DELETE"])
+def ruta_reservas_detalle(id):
+    return reenviar(request.method, RESERVAS_URL + "/reservas/" + str(id))
+
+
+@app.route("/reservas/<int:id>/detalles", methods=["GET"])
+def ruta_reservas_detalles(id):
+    return reenviar(request.method, RESERVAS_URL + "/reservas/" + str(id) + "/detalles")
+
+
+@app.route("/pagos", methods=["GET", "POST"])
+def ruta_pagos():
+    return reenviar(request.method, PAGOS_URL + "/pagos")
+
+
+@app.route("/pagos/<int:id>", methods=["GET"])
+def ruta_pagos_detalle(id):
+    return reenviar(request.method, PAGOS_URL + "/pagos/" + str(id))
+
+
+@app.route("/notificaciones", methods=["GET", "POST"])
+def ruta_notificaciones():
+    return reenviar(request.method, NOTIFICACIONES_URL + "/notificaciones")
 
 app.run(host="0.0.0.0", port=5000)
