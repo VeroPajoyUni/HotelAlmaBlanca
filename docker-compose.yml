@@ -94,12 +94,22 @@ services:
       - reservas
       
   notificaciones-db:
-    image: redis:alpine
-    command: sh -c "echo 'Base de datos de Notificaciones (pendiente)' && sleep infinity"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${NOTIFICACIONES_DB_NAME}
+      POSTGRES_USER: ${NOTIFICACIONES_DB_USER}
+      POSTGRES_PASSWORD: ${NOTIFICACIONES_DB_PASSWORD}
+    ports:
+      - "5437:5432"
+    volumes:  
+      - notificaciones_data:/var/lib/postgresql/data
     
   notificaciones:
-    image: node:alpine
-    command: sh -c "echo 'Servicio Notificaciones (pendiente de implementar)' && sleep infinity"
+    build: ./servicios/notificaciones
+    ports:
+      - "5005:5000"
+    env_file:
+      - .env
     depends_on:
       - notificaciones-db
 
@@ -108,4 +118,5 @@ volumes:
   usuarios_data:
   habitaciones_data:
   pagos_data:
+  notificaciones_data:
 
