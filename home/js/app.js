@@ -1,11 +1,8 @@
 /* ==========================================================
-   1. CONFIGURACIÓN: dirección de cada microservicio
-   (puertos publicados en docker-compose.yml)
+   1. CONFIGURACIÓN: dirección del API Gateway
+   (todas las peticiones pasan por él; puerto publicado en docker-compose.yml)
    ========================================================== */
-const API_USUARIOS = "http://localhost:5001";
-const API_RESERVAS = "http://localhost:5002";
-const API_HABITACIONES = "http://localhost:5003";
-const API_PAGOS = "http://localhost:5004";
+const API_GATEWAY = "http://localhost:8080";
 
 const FOTOS_HABITACION = {
     sencilla: "img/habitacion-sencilla.jpg",
@@ -62,7 +59,7 @@ function calcularNoches(entrada, salida) {
 
 function textoError(error, servicio) {
     if (error instanceof TypeError) {
-        return `No se pudo conectar con el servicio de ${servicio}. ¿Está encendido?`;
+        return `No se pudo conectar con el API Gateway para consultar ${servicio}. ¿Está encendido?`;
     }
     return error.message;
 }
@@ -79,7 +76,7 @@ function buscarPorId(lista, id) {
    ========================================================== */
 async function cargarHabitaciones() {
     try {
-        const respuesta = await fetch(API_HABITACIONES + "/habitaciones");
+        const respuesta = await fetch(API_GATEWAY + "/habitaciones");
         habitaciones = await respuesta.json();
         if (!respuesta.ok) throw new Error(habitaciones.mensaje);
 
@@ -116,6 +113,8 @@ async function cargarHabitaciones() {
                 </article>`;
         });
     } catch (error) {
+        // Si el gateway respondió con error, aquí quedó su JSON y la tabla de reservas fallaría al buscar en él
+        habitaciones = [];
         selectHabitacion.innerHTML = '<option value="">Sin conexión</option>';
         listaHabitaciones.innerHTML = `<p class="mensaje error">${textoError(error, "Habitaciones")}</p>`;
     }
@@ -127,7 +126,7 @@ async function cargarHabitaciones() {
    ========================================================== */
 async function cargarUsuarios() {
     try {
-        const respuesta = await fetch(API_USUARIOS + "/usuarios");
+        const respuesta = await fetch(API_GATEWAY + "/usuarios");
         usuarios = await respuesta.json();
         if (!respuesta.ok) throw new Error(usuarios.mensaje);
 
@@ -137,6 +136,7 @@ async function cargarUsuarios() {
                 <option value="${usuario.id}">${usuario.nombre} ${usuario.apellido}</option>`;
         });
     } catch (error) {
+        usuarios = [];
         selectUsuario.innerHTML = '<option value="">Sin conexión</option>';
     }
 }
@@ -157,7 +157,7 @@ formRegistro.addEventListener("submit", async function (evento) {
     };
 
     try {
-        const respuesta = await fetch(API_USUARIOS + "/usuarios", {
+        const respuesta = await fetch(API_GATEWAY + "/usuarios", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(nuevoUsuario),
@@ -213,7 +213,7 @@ formBuscar.addEventListener("submit", async function (evento) {
     }
 
     try {
-        const url = `${API_RESERVAS}/reservas/disponibilidad?habitacion_id=${consulta.habitacion_id}`
+        const url = `${API_GATEWAY}/reservas/disponibilidad?habitacion_id=${consulta.habitacion_id}`
             + `&fecha_entrada=${consulta.fecha_entrada}&fecha_salida=${consulta.fecha_salida}`;
         const respuesta = await fetch(url);
         const disponibilidad = await respuesta.json();
@@ -243,7 +243,7 @@ formBuscar.addEventListener("input", function () {
    ========================================================== */
 btnConfirmar.addEventListener("click", async function () {
     try {
-        const respuesta = await fetch(API_RESERVAS + "/reservas", {
+        const respuesta = await fetch(API_GATEWAY + "/reservas", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(reservaPendiente),
@@ -269,7 +269,7 @@ btnConfirmar.addEventListener("click", async function () {
    ========================================================== */
 async function cargarReservas() {
     try {
-        const respuesta = await fetch(API_RESERVAS + "/reservas");
+        const respuesta = await fetch(API_GATEWAY + "/reservas");
         const reservas = await respuesta.json();
         if (!respuesta.ok) throw new Error(reservas.mensaje);
 
@@ -327,7 +327,7 @@ async function cargarReservas() {
    ========================================================== */
 async function eliminarReserva(id) {
     try {
-        const respuesta = await fetch(API_RESERVAS + "/reservas/" + id, { method: "DELETE" });
+        const respuesta = await fetch(API_GATEWAY + "/reservas/" + id, { method: "DELETE" });
         const confirmacion = await respuesta.json();
         mostrarMensaje(mensajeReservas, confirmacion.mensaje, respuesta.ok ? "ok" : "error");
         cargarReservas();
@@ -378,7 +378,7 @@ function mostrarAvisosCircuito(contenedor, circuitos, accion) {
 
 async function revisarCircuitos() {
     try {
-        const respuesta = await fetch(API_RESERVAS + "/reservas/circuito");
+        const respuesta = await fetch(API_GATEWAY + "/reservas/circuito");
         const circuitos = await respuesta.json();
         if (!respuesta.ok) throw new Error(circuitos.mensaje);
         mostrarAvisosCircuito(avisoCircuitos, circuitos, "confirmar reservas");
@@ -390,7 +390,7 @@ async function revisarCircuitos() {
 
 async function revisarCircuitoPagos() {
     try {
-        const respuesta = await fetch(API_PAGOS + "/pagos/circuito");
+        const respuesta = await fetch(API_GATEWAY + "/pagos/circuito");
         const circuito = await respuesta.json();
         if (!respuesta.ok) throw new Error(circuito.mensaje);
         // Pagos responde un solo circuito (el de su llamada a Reservas), sin nombre de servicio
@@ -407,7 +407,7 @@ async function revisarCircuitoPagos() {
    ========================================================== */
 async function cargarPagos() {
     try {
-        const respuesta = await fetch(API_PAGOS + "/pagos");
+        const respuesta = await fetch(API_GATEWAY + "/pagos");
         pagos = await respuesta.json();
         if (!respuesta.ok) throw new Error(pagos.mensaje);
     } catch (error) {
@@ -437,7 +437,7 @@ formPago.addEventListener("submit", async function (evento) {
     }
 
     try {
-        const respuesta = await fetch(API_PAGOS + "/pagos", {
+        const respuesta = await fetch(API_GATEWAY + "/pagos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
